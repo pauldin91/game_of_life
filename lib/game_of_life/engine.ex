@@ -1,7 +1,17 @@
-defmodule Engine do
+defmodule GameOfLife.Engine do
+  alias Finch.Pool.Strategy.Random
+
   @doc """
   Apply the rules of Conway's Game of Life to a grid of cells
   """
+
+  def new_board(size) do
+    0..(size - 1)
+    |> Enum.map(fn _ ->
+      0..(size - 1)
+      |> Enum.map(fn _ -> :rand.uniform(2) - 1 end)
+    end)
+  end
 
   @spec tick(matrix :: list(list(0 | 1))) :: list(list(0 | 1))
   def tick([]), do: []
@@ -61,7 +71,7 @@ defmodule Engine do
           total == 3 ->
             {i, 1}
 
-          2 <= total and total <= 3 and v == 1->
+          2 <= total and total <= 3 and v == 1 ->
             {i, v}
 
           true ->

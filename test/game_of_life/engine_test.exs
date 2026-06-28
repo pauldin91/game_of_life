@@ -1,5 +1,6 @@
 defmodule EngineTest do
   use ExUnit.Case
+  alias GameOfLife.Engine
 
   #
   test "empty matrix" do

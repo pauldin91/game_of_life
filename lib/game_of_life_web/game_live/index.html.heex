@@ -1,0 +1,17 @@
+    <.header>
+      Uploads of {@current_user.email}
+      <:actions>
+        <.link patch={~p"/new"}>
+          <.icon name="hero-play-circle" class="w-7 h-7" />
+        </.link>
+      </:actions>
+
+    </.header>
+
+    <.table
+      id="board"
+      rows={@board}
+    >
+    
+    </.table>
+
