@@ -7,10 +7,6 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   @impl true
   def handle_event("next", _map, socket) do
-    {:noreply, assign(socket, :board, GameOfLife.Engine.new_board(9))}
+    {:noreply, assign(socket, :board, GameOfLife.Engine.tick(socket.assigns.board))}
   end
-
-  # @impl true
-  # def handle_info() do
-  # end
 end
