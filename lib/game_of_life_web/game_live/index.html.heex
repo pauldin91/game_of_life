@@ -1,17 +1,38 @@
-    <.header>
-      Uploads of {@current_user.email}
-      <:actions>
-        <.link patch={~p"/new"}>
-          <.icon name="hero-play-circle" class="w-7 h-7" />
-        </.link>
-      </:actions>
+<div class="flex flex-col items-center gap-4 p-6">
+  <div class="flex items-center gap-4">
+    <h1 class="text-2xl font-bold tracking-tight">Conway's Game of Life</h1>
+  </div>
 
-    </.header>
+  <table style="border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th style="width: 40px; height: 40px;"></th>
+        <th
+          :for={i <- 1..length(@board)}
+          style="width: 40px; height: 40px; text-align: center; font-size: 13px; font-weight: 600; color: #6b7280;"
+        >
+          {i}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr :for={{row, i} <- Enum.with_index(@board, 1)}>
+        <th style="width: 40px; height: 40px; text-align: center; font-size: 13px; font-weight: 600; color: #6b7280;">
+          {i}
+        </th>
+        <td
+          :for={{cell, j} <- Enum.with_index(row, 1)}
+          style={"width: 40px; height: 40px; text-align: center; vertical-align: middle; border: 1px solid #374151; background-color: #{if rem(i + j, 2) == 0, do: "#f0d9b5", else: "#b58863"}; font-weight: bold; font-size: 16px; color: #1a1a1a;"}
+        >
+          {cell}
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-    <.table
-      id="board"
-      rows={@board}
-    >
-    
-    </.table>
-
+  <div class="flex items-center gap-4">
+    <.button phx-click="next">
+      <.icon name="hero-play-circle" class="w-7 h-7" />
+    </.button>
+  </div>
+</div>
