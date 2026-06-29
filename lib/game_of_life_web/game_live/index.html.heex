@@ -21,7 +21,7 @@
           {i}
         </th>
         <td
-          :for={{cell, j} <- Enum.with_index(row, 1)}
+          :for={{cell, _j} <- Enum.with_index(row, 1)}
           style={"width: 40px; height: 40px; text-align: center; vertical-align: middle; border: 1px solid #374151; background-color: #{if cell == 0, do: "#f0d9b5", else: "#b58863"}; font-weight: bold; font-size: 16px; color: #1a1a1a;"}
         >
           {cell}
@@ -29,14 +29,23 @@
       </tr>
     </tbody>
   </table>
-  <.flash kind={:info} flash={@flash} />
-  <div class="flex items-center gap-4">
-    <.button phx-click="start">
-      <.icon name="hero-play-circle" class="w-7 h-7" />
-    </.button>
 
-    <.button phx-click="reset">
-      <.icon name="hero-arrow-path" class="w-7 h-7" />
-    </.button>
+  <.flash kind={:info} flash={@flash} />
+  <div class="flex flex-col items-center gap-4 p-6">
+    <div class="flex flex-row justify-center items-center gap-4">
+      <.button phx-click="start">
+        <.icon name="hero-play-circle" class="w-7 h-7" />
+      </.button>
+      <.button phx-click="reset">
+        <.icon name="hero-arrow-path" class="w-7 h-7" />
+      </.button>
+    </div>
+
+    <.render_prop_input entry={
+      %{name: "delay", value: @delay, default: 500, min: 100, max: 2000, step: 100}
+    } />
+    <.render_prop_input entry={
+      %{name: "size", value: @size, default: 5, min: 3, max: 32, step: 1}
+    } />
   </div>
 </div>
