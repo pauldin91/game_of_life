@@ -30,13 +30,15 @@ defmodule GameOfLifeWeb.GameLive.Index do
   @impl true
   def handle_event("size", %{"size" => value}, socket) do
     size = String.to_integer(value)
-    dbg("size triggered")
-    {:noreply, socket |> assign(:size, size) |> do_reset()}
+
+    {:noreply,
+     socket
+     |> assign(:size, size)
+     |> do_reset()}
   end
 
   @impl true
   def handle_event("delay", %{"delay" => value}, socket) do
-    dbg("delay triggered")
     {:noreply, assign(socket, :delay, String.to_integer(value))}
   end
 

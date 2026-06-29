@@ -106,3 +106,32 @@
 [data-phx-session], [data-phx-teleported-src] { display: contents }
 
 /* This file is for your main application CSS */
+
+
+.board-table {
+  border-collapse: collapse;
+}
+
+.board-cell-label {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.board-cell {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid #374151;
+}
+
+.board-cell-light { background-color: #f0d9b5; }
+.board-cell-dark  { background-color: #b58863; }
+
+[data-theme=dark] .board-cell { border-color: #6b7280; }
+[data-theme=dark] .board-cell-light { background-color: #b8966e; }
+[data-theme=dark] .board-cell-dark  { background-color: #6b4c2a; }
