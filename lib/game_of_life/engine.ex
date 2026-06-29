@@ -1,6 +1,4 @@
 defmodule GameOfLife.Engine do
-  alias Finch.Pool.Strategy.Random
-
   @doc """
   Apply the rules of Conway's Game of Life to a grid of cells
   """
@@ -38,6 +36,13 @@ defmodule GameOfLife.Engine do
     indices(i, size)
     |> Enum.map(fn i -> Map.get(the_map, i, 0) end)
     |> Enum.sum()
+  end
+
+  def game_over?(matrix) do
+    cond do
+      Enum.reduce(matrix, [], fn x, acc -> acc ++ x end) |> Enum.sum() == 0 -> true
+      true -> false
+    end
   end
 
   def indices(i, size) do

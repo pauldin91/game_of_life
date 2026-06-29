@@ -22,17 +22,21 @@
         </th>
         <td
           :for={{cell, j} <- Enum.with_index(row, 1)}
-          style={"width: 40px; height: 40px; text-align: center; vertical-align: middle; border: 1px solid #374151; background-color: #{if rem(i + j, 2) == 0, do: "#f0d9b5", else: "#b58863"}; font-weight: bold; font-size: 16px; color: #1a1a1a;"}
+          style={"width: 40px; height: 40px; text-align: center; vertical-align: middle; border: 1px solid #374151; background-color: #{if cell == 0, do: "#f0d9b5", else: "#b58863"}; font-weight: bold; font-size: 16px; color: #1a1a1a;"}
         >
           {cell}
         </td>
       </tr>
     </tbody>
   </table>
-
+  <.flash kind={:info} flash={@flash} />
   <div class="flex items-center gap-4">
-    <.button phx-click="next">
+    <.button phx-click="start">
       <.icon name="hero-play-circle" class="w-7 h-7" />
+    </.button>
+
+    <.button phx-click="reset">
+      <.icon name="hero-arrow-path" class="w-7 h-7" />
     </.button>
   </div>
 </div>
