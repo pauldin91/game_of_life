@@ -31,6 +31,22 @@ defmodule GameOfLife.Engine do
     end
   end
 
+  def toogle_cell(matrix, i, j) do
+    size = length(matrix)
+
+    Enum.zip(
+      0..(size * size - 1),
+      Enum.reduce(matrix, [], fn x, acc -> acc ++ x end)
+    )
+    |> Enum.map(fn {x, y} ->
+      cond do
+        i * size + j == x -> 1 - y
+        true -> y
+      end
+    end)
+    |> Enum.chunk_every(size)
+  end
+
   defp make_map(matrix, size),
     do:
       Enum.zip(
