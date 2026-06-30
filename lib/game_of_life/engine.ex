@@ -24,20 +24,6 @@ defmodule GameOfLife.Engine do
     |> Enum.chunk_every(size)
   end
 
-  def make_map(matrix, size),
-    do:
-      Enum.zip(
-        0..(size * size - 1),
-        Enum.reduce(matrix, [], fn x, acc -> acc ++ x end)
-      )
-      |> Map.new()
-
-  def calculate_cell(the_map, i, size) do
-    indices(i, size)
-    |> Enum.map(fn i -> Map.get(the_map, i, 0) end)
-    |> Enum.sum()
-  end
-
   def game_over?(matrix) do
     cond do
       Enum.reduce(matrix, [], fn x, acc -> acc ++ x end) |> Enum.sum() == 0 -> true
@@ -45,45 +31,47 @@ defmodule GameOfLife.Engine do
     end
   end
 
-  def indices(i, size) do
+  defp make_map(matrix, size),
+    do:
+      Enum.zip(
+        0..(size * size - 1),
+        Enum.reduce(matrix, [], fn x, acc -> acc ++ x end)
+      )
+      |> Map.new()
+
+  defp get_side(start, step) do
+    (start - step)..(start + step)//step |> Enum.map(& &1)
+  end
+
+  defp indices(i, size) do
     r = rem(i, size)
-    right = (i + 1 - size)..(i + 1 + size)//size |> Enum.map(& &1)
-    left = (i - 1 - size)..(i - 1 + size)//size |> Enum.map(& &1)
-    top = i - size
-    bottom = i + size
+    right = get_side(i + 1, size)
+    left = get_side(i - 1, size)
 
-    init = [top, bottom]
-
-    init ++
+    [i - size, i + size] ++
       cond do
-        r == 0 ->
-          right
-
-        r == size - 1 ->
-          left
-
-        true ->
-          left ++ right
+        r == 0 -> right
+        r == size - 1 -> left
+        true -> left ++ right
       end
   end
 
-  def apply_rules(the_map, size) do
+  defp apply_rules(the_map, size) do
     Enum.map(the_map, fn
       {i, v} ->
         total = calculate_cell(the_map, i, size)
 
         cond do
-          total == 3 ->
-            {i, 1}
-
-          2 <= total and total <= 3 and v == 1 ->
-            {i, v}
-
-          true ->
-            {i, 0}
+          total == 3 -> {i, 1}
+          2 <= total and total <= 3 and v == 1 -> {i, v}
+          true -> {i, 0}
         end
     end)
   end
 
-  def sum_row(row, the_map), do: Enum.map(row, fn x -> Map.get(the_map, x, 0) end) |> Enum.sum()
+  defp calculate_cell(the_map, i, size) do
+    indices(i, size)
+    |> Enum.map(fn i -> Map.get(the_map, i, 0) end)
+    |> Enum.sum()
+  end
 end
