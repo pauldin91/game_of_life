@@ -55,16 +55,23 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   def handle_info(:tick, socket), do: {:noreply, socket}
 
+  def handle_info(:sim_ended, socket) do
+    {:noreply,
+     socket
+     |> assign(:running, false)
+     |> assign(:board, GameOfLife.Engine.new_board(socket.assigns.size))
+     |> put_flash(:info, "Simulation ended")}
+  end
+
   defp do_reset(socket) do
     socket
     |> assign(:board, GameOfLife.Engine.new_board(socket.assigns.size))
     |> assign(:running, false)
-    |> put_flash(:info, "Simulation ended")
   end
 
   defp schedule_tick(socket) do
     if GameOfLife.Engine.game_over?(socket.assigns.board) do
-      Process.send(self(), :reset, [])
+      Process.send(self(), :sim_ended, [])
     else
       Process.send_after(self(), :tick, socket.assigns.delay)
     end
