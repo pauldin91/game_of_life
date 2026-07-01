@@ -26,7 +26,7 @@ defmodule GameOfLife.Engine do
 
   def game_over?(matrix) do
     cond do
-      Enum.reduce(matrix, [], fn x, acc -> acc ++ x end) |> Enum.sum() == 0 -> true
+      Enum.reduce(matrix, 0, fn x, acc -> acc + Enum.sum(x) end) -> true
       true -> false
     end
   end

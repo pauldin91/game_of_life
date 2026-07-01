@@ -33,11 +33,7 @@
       </.button>
     </div>
 
-    <.render_prop_input entry={
-      %{name: "delay", value: @delay, default: 500, min: 100, max: 2000, step: 100}
-    } />
-    <.render_prop_input entry={
-      %{name: "size", value: @size, default: 5, min: 3, max: 32, step: 1}
-    } />
+    <.render_prop_input entry={%{name: "delay", value: @delay, default: 500, min: 50, max: 2000, step: 50}} />
+    <.render_prop_input entry={%{name: "size", value: @size, default: 5, min: 3, max: 64, step: 1}} />
   </div>
 </div>
