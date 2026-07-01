@@ -17,8 +17,8 @@
           :for={{cell, j} <- Enum.with_index(row, 1)}
           class={"board-cell #{if cell == 0, do: "board-cell-light", else: "board-cell-dark"}"}
           phx-click="toggle"
-          phx-value-i={i-1}
-          phx-value-j={j-1}
+          phx-value-i={i - 1}
+          phx-value-j={j - 1}
           style="cursor: pointer;"
         >
         </td>
@@ -29,11 +29,20 @@
   <.flash kind={:info} flash={@flash} />
   <div class="flex flex-col items-center gap-4 p-6">
     <div class="flex flex-row justify-center items-center gap-4">
-      <.button phx-click="start">
-        <.icon name="hero-play-circle" class="w-7 h-7" />
-      </.button>
+      <%= if @running do %>
+        <.button phx-click="pause">
+          <.icon name="hero-pause-circle" class="w-7 h-7" />
+        </.button>
+      <% else %>
+        <.button phx-click="start">
+          <.icon name="hero-play-circle" class="w-7 h-7" />
+        </.button>
+      <% end %>
       <.button phx-click="reset">
         <.icon name="hero-arrow-path" class="w-7 h-7" />
+      </.button>
+      <.button phx-click="stop">
+        <.icon name="hero-stop" class="w-7 h-7" />
       </.button>
     </div>
 
