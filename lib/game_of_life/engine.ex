@@ -33,7 +33,7 @@ defmodule GameOfLife.Engine do
     end
   end
 
-  def toogle_cell(matrix, i, j) do
+  def toggle_cell(matrix, i, j) do
     size = length(matrix)
 
     Enum.zip(
