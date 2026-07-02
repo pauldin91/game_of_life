@@ -17,8 +17,10 @@ defmodule GameOfLife.Board do
     end)
   end
 
+  def alive(matrix), do: Enum.reduce(matrix, 0, fn x, acc -> acc + Enum.sum(x) end)
+
   def game_over?(matrix) do
-    sum = Enum.reduce(matrix, 0, fn x, acc -> acc + Enum.sum(x) end)
+    sum = alive(matrix)
 
     cond do
       sum == 0 -> true
