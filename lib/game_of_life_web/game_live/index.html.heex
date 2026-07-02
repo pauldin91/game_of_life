@@ -58,10 +58,10 @@
         name="selected_mode"
         class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
       >
-        <option value="">Choose mode</option>
         <option
           :for={{label, value} <- @modes}
           value={value}
+          selected={value == @selected_mode}
         >
           {label}
         </option>

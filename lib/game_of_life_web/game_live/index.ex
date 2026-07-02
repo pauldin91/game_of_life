@@ -19,34 +19,27 @@ defmodule GameOfLifeWeb.GameLive.Index do
   end
 
   @impl true
-  def handle_event(
-        "start",
-        _params,
-        %{assigns: %{running: false}} = socket
-      ) do
+  def handle_event("start", _params, %{assigns: %{running: false}} = socket) do
     schedule_tick(socket)
     {:noreply, assign(socket, :running, true)}
   end
 
   def handle_event("start", _params, socket), do: {:noreply, socket}
 
+  @impl true
   def handle_event("select_mode", _params, %{assigns: %{running: true}} = socket),
     do: {:noreply, socket}
 
-  def handle_event("select_mode", params, %{assigns: %{running: false}} = socket),
-    do:
-      {:noreply,
-       assign(socket, :selected_mode, params["selected_mode"])
-       |> assign(:board, GameOfLife.Board.new_board(socket.assigns.size, params["selected_mode"]))}
+  def handle_event("select_mode", %{"selected_mode" => mode}, socket) do
+    {:noreply,
+     socket
+     |> assign(:selected_mode, mode)
+     |> assign(:board, GameOfLife.Board.new_board(socket.assigns.size, mode))}
+  end
 
   @impl true
   def handle_event("size", %{"size" => value}, socket) do
-    size = String.to_integer(value)
-
-    {:noreply,
-     socket
-     |> assign(:size, size)
-     |> do_reset()}
+    {:noreply, socket |> assign(:size, String.to_integer(value)) |> do_reset()}
   end
 
   @impl true
@@ -86,13 +79,13 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   defp do_reset(socket) do
     socket
-    |> assign(:board, GameOfLife.Board.new_board(socket.assigns.size,socket.assigns.selected_mode))
+    |> assign(:board, GameOfLife.Board.new_board(socket.assigns.size, socket.assigns.selected_mode))
     |> assign(:running, false)
   end
 
   defp schedule_tick(socket) do
     if GameOfLife.Board.game_over?(socket.assigns.board) do
-      Process.send(self(), :sim_ended, [])
+      send(self(), :sim_ended)
     else
       Process.send_after(self(), :tick, socket.assigns.delay)
     end
