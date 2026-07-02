@@ -31,10 +31,11 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
 
 ## TODOs
 
-Features to be added later
-    - Analytics
-    - Record simulation
-    - Color pallete
+### Features to be added later
+    - Statistics
+    - Patterns
+    - Variations
+    - Modes
 
 
 ## Learn more
