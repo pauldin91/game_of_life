@@ -6,6 +6,8 @@ defmodule GameOfLife.Orchestrator do
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts)
 
   def next(pid), do: GenServer.call(pid, :next)
+  def toggle_cell(pid, i, j), do: GenServer.cast(pid, {:toggle, %{i: i, j: j}})
+  def gameover?(pid), do: GenServer.call(pid, :gameover)
 
   @impl true
   def init(opts) do
@@ -35,5 +37,16 @@ defmodule GameOfLife.Orchestrator do
     }
 
     {:reply, new_state, new_state}
+  end
+
+  @impl true
+  def handle_call(:gameover, _from, state) do
+    {:reply, state.alive == 0, state}
+  end
+
+  @impl true
+  def handle_cast({:toggle, %{i: i, j: j}}, state) do
+    new_state = %__MODULE__{state | board: GameOfLife.Board.toggle_cell(state.board, i, j)}
+    {:noreply, new_state}
   end
 end

@@ -57,7 +57,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
   def handle_event("toggle", %{"i" => i, "j" => j}, socket) do
     i = String.to_integer(i)
     j = String.to_integer(j)
-    {:noreply, assign(socket, :board, GameOfLife.Engine.toggle_cell(socket.assigns.board, i, j))}
+    {:noreply, assign(socket, :board, GameOfLife.Board.toggle_cell(socket.assigns.board, i, j))}
   end
 
   @impl true
@@ -79,7 +79,10 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   defp do_reset(socket) do
     socket
-    |> assign(:board, GameOfLife.Board.new_board(socket.assigns.size, socket.assigns.selected_mode))
+    |> assign(
+      :board,
+      GameOfLife.Board.new_board(socket.assigns.size, socket.assigns.selected_mode)
+    )
     |> assign(:running, false)
   end
 
