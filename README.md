@@ -35,6 +35,7 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
     - Statistics
     - Patterns
     - Variations
+    - Modes
 
 
 ## Learn more
