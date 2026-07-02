@@ -31,7 +31,7 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
 
 ## TODOs
 
-Features to be added later
+### Features to be added later
     - Statistics
     - Patterns
     - Variations
