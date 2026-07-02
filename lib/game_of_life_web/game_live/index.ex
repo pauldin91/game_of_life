@@ -4,6 +4,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   @default_size 5
   @default_delay 500
+  @modes [{"Random", "random"}, {"Custom", "custom"}]
 
   @impl true
   def mount(_params, _session, socket) do
@@ -11,8 +12,10 @@ defmodule GameOfLifeWeb.GameLive.Index do
      socket
      |> assign_new(:size, fn -> @default_size end)
      |> assign_new(:delay, fn -> @default_delay end)
+     |> assign_new(:modes, fn -> @modes end)
+     |> assign_new(:selected_mode, fn -> "random" end)
      |> assign(:running, false)
-     |> assign(:board, GameOfLife.Engine.new_board(@default_size))}
+     |> assign(:board, GameOfLife.Board.new_board(@default_size, "random"))}
   end
 
   @impl true
@@ -26,6 +29,15 @@ defmodule GameOfLifeWeb.GameLive.Index do
   end
 
   def handle_event("start", _params, socket), do: {:noreply, socket}
+
+  def handle_event("select_mode", _params, %{assigns: %{running: true}} = socket),
+    do: {:noreply, socket}
+
+  def handle_event("select_mode", params, %{assigns: %{running: false}} = socket),
+    do:
+      {:noreply,
+       assign(socket, :selected_mode, params["selected_mode"])
+       |> assign(:board, GameOfLife.Board.new_board(socket.assigns.size, params["selected_mode"]))}
 
   @impl true
   def handle_event("size", %{"size" => value}, socket) do
@@ -74,12 +86,12 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   defp do_reset(socket) do
     socket
-    |> assign(:board, GameOfLife.Engine.new_board(socket.assigns.size))
+    |> assign(:board, GameOfLife.Board.new_board(socket.assigns.size,socket.assigns.selected_mode))
     |> assign(:running, false)
   end
 
   defp schedule_tick(socket) do
-    if GameOfLife.Engine.game_over?(socket.assigns.board) do
+    if GameOfLife.Board.game_over?(socket.assigns.board) do
       Process.send(self(), :sim_ended, [])
     else
       Process.send_after(self(), :tick, socket.assigns.delay)

@@ -49,5 +49,23 @@
     <.render_prop_input entry={
       %{name: "size", value: @size, default: 5, min: 3, max: 64, step: 1}
     } />
+    <form class="max-w-sm mx-auto" phx-change="select_mode">
+      <label for="mode-select" class="block mb-2.5 text-sm font-medium text-heading">
+        Select mode
+      </label>
+      <select
+        id="mode-select"
+        name="selected_mode"
+        class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
+      >
+        <option value="">Choose mode</option>
+        <option
+          :for={{label, value} <- @modes}
+          value={value}
+        >
+          {label}
+        </option>
+      </select>
+    </form>
   </div>
 </div>

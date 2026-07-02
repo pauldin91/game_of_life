@@ -3,13 +3,7 @@ defmodule GameOfLife.Engine do
   Apply the rules of Conway's Game of Life to a grid of cells
   """
 
-  def new_board(size) do
-    0..(size - 1)
-    |> Enum.map(fn _ ->
-      0..(size - 1)
-      |> Enum.map(fn _ -> :rand.uniform(2) - 1 end)
-    end)
-  end
+
 
   @spec tick(matrix :: list(list(0 | 1))) :: list(list(0 | 1))
   def tick([]), do: []
@@ -22,15 +16,6 @@ defmodule GameOfLife.Engine do
     |> Enum.sort(fn e1, e2 -> elem(e1, 0) < elem(e2, 0) end)
     |> Enum.map(fn {_i, v} -> v end)
     |> Enum.chunk_every(size)
-  end
-
-  def game_over?(matrix) do
-    sum = Enum.reduce(matrix, 0, fn x, acc -> acc + Enum.sum(x) end)
-
-    cond do
-      sum == 0 -> true
-      true -> false
-    end
   end
 
   def toggle_cell(matrix, i, j) do
