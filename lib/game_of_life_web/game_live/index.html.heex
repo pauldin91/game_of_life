@@ -1,10 +1,11 @@
 <div class="flex flex-col items-center gap-4 p-6" id="screen-size-hook" phx-hook="ScreenSize">
   <h1 class="text-2xl font-bold tracking-tight">Conway's Game of Life</h1>
 
-  <div class="flex flex-row gap-8 justify-center items-start">
+  <div class="flex flex-row gap-8 justify-center items-start" style={"height: #{@board_px}px;"}>
     <!-- left column: controls + patterns -->
-    <div class="flex flex-col gap-4 items-center justify-start" style="width: 220px;">
-      <div class="flex flex-col gap-4 items-center w-full">
+    <div class="flex flex-col gap-4 items-center h-full" style="width: 220px;">
+      <!-- controls: fixed, never scroll -->
+      <div class="flex flex-col gap-4 items-center w-full flex-shrink-0">
         <.render_prop_input entry={
           %{name: "delay", value: @delay, default: @delay, min: 50, max: 2000, step: 50}
         } />
@@ -40,8 +41,8 @@
         </div>
       </div>
 
-      <!-- patterns: scrollable -->
-      <div class="w-full overflow-y-auto" style={"max-height: #{@board_px}px;"}>
+      <!-- patterns: scrollable, takes remaining height -->
+      <div class="w-full overflow-y-auto flex-1 min-h-0">
         <div class="flex flex-col gap-6">
           <div
             :for={{cat, v} <- GameOfLife.Patterns.all(@patterns_pid)}
@@ -57,9 +58,9 @@
       </div>
     </div>
 
-    <!-- main board -->
+    <!-- main board: scrollable if board exceeds board_px -->
     <div
-      class="flex items-center justify-center border border-gray-200 rounded"
+      class="flex items-center justify-center overflow-auto border border-gray-200 rounded flex-shrink-0"
       style={"width: #{@board_px}px; height: #{@board_px}px;"}
     >
       <.board matrix={@board} toggleable />

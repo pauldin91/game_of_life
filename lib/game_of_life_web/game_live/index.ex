@@ -2,8 +2,8 @@ defmodule GameOfLifeWeb.GameLive.Index do
   use GameOfLifeWeb, :live_view
   import GameOfLifeWeb.CustomComponents
 
-  @default_size 36
-  @default_delay 500
+  @default_size 12
+  @default_delay 200
   @left_col_width 220
   @gap 64
   @padding 48
@@ -68,7 +68,6 @@ defmodule GameOfLifeWeb.GameLive.Index do
     do:
       {:noreply,
        socket
-       |> assign(:running, false)
        |> assign(
          :board,
          GameOfLife.Board.toggle_cell(
