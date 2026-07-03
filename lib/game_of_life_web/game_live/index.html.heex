@@ -1,24 +1,21 @@
 <div class="flex flex-col items-center gap-4 p-6">
-  <div class="flex items-center gap-4">
-    <h1 class="text-2xl font-bold tracking-tight">Conway's Game of Life</h1>
-  </div>
+  <h1 class="text-2xl font-bold tracking-tight">Conway's Game of Life</h1>
 
-  <div class="flex flex-row gap-8 justify-center items-center p-6">
-    <div class="flex flex-col gap-4 items-center justify-center">
+  <div class="flex flex-row gap-8 justify-center items-start">
+    <!-- controls column -->
+    <div class="flex flex-col gap-4 items-center justify-start w-64 h-[1000px]">
       <.render_prop_input entry={
         %{name: "delay", value: @delay, default: @delay, min: 50, max: 2000, step: 50}
       } />
       <.render_prop_input entry={
-        %{name: "size", value: @size, default: @size, min: 3, max: 64, step: 1}
+        %{name: "size", value: @size, default: @size, min: 5, max: 48, step: 1}
       } />
-      <form class="max-w-sm mx-auto" phx-change="select_mode">
-        <label for="mode-select" class="block mb-2.5 text-sm font-medium text-heading">
-          Select mode
-        </label>
+      <form class="w-full" phx-change="select_mode">
+        <label for="mode-select" class="block mb-2 text-sm font-medium">Select mode</label>
         <select
           id="mode-select"
           name="selected_mode"
-          class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
+          class="block w-full px-3 py-2 border text-sm rounded"
         >
           <option
             :for={{label, value} <- @modes}
@@ -29,35 +26,40 @@
           </option>
         </select>
       </form>
-
       <div class="flex flex-row justify-center items-center gap-4">
-        <%= if @running do %>
-          <.button phx-click="pause">
-            <.icon name="hero-pause-circle" class="w-7 h-7" />
-          </.button>
-        <% else %>
-          <.button phx-click="start">
-            <.icon name="hero-play-circle" class="w-7 h-7" />
-          </.button>
-        <% end %>
+        <.button :if={@running} phx-click="pause">
+          <.icon name="hero-pause-circle" class="w-7 h-7" />
+        </.button>
+        <.button :if={!@running} phx-click="start">
+          <.icon name="hero-play-circle" class="w-7 h-7" />
+        </.button>
         <.button phx-click="reset">
           <.icon name="hero-arrow-path" class="w-7 h-7" />
         </.button>
       </div>
     </div>
-    <!-- right column: main board -->
-    <div class="flex items-center justify-center">
+
+    <!-- main board column: fixed size, board centered inside -->
+    <div class="flex items-center justify-center w-[1000px] h-[1000px] border border-gray-200 rounded">
       <.board matrix={@board} toggleable />
     </div>
 
-    <!-- left column: small boards -->
-    <div class="flex flex-col gap-4 items-center overflow-y-auto max-h-screen">
-      <div
-        :for={{l, v} <- GameOfLife.Patterns.all(@patterns_pid)}
-        class="flex flex-col items-center gap-1"
-      >
-        <span class="text-sm font-medium text-gray-500">{l}</span>
-        <.board matrix={v} />
+    <!-- patterns column: fixed size, scrollable inside -->
+    <div class="w-64 h-[1000px] overflow-y-auto overflow-x-auto">
+      <div class="flex flex-row gap-6 items-start">
+        <div
+          :for={{cat, v} <- GameOfLife.Patterns.all(@patterns_pid)}
+          class="flex flex-col gap-4 items-center"
+        >
+          <span class="text-sm font-semibold text-gray-700">{cat}</span>
+          <div
+            :for={{l, p} <- v}
+            class="flex flex-col items-center gap-1"
+          >
+            <span class="text-sm font-medium text-gray-500">{l}</span>
+            <.board matrix={p} />
+          </div>
+        </div>
       </div>
     </div>
   </div>
