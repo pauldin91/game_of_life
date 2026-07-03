@@ -26,27 +26,27 @@ defmodule GameOfLifeWeb.CustomComponents do
   end
 
   attr :matrix, :any, required: true
+  attr :toggleable, :boolean, default: false
 
-  @spec board(map()) :: Phoenix.LiveView.Rendered.t()
   def board(assigns) do
     ~H"""
     <table class="board-table">
       <thead>
         <tr>
           <th class="board-cell-label"></th>
-          <th :for={i <- 1..Enum.count(@board)} class="board-cell-label">{i}</th>
+          <th :for={i <- 1..Enum.count(@matrix)} class="board-cell-label">{i}</th>
         </tr>
       </thead>
       <tbody>
-        <tr :for={{row, i} <- Enum.with_index(@board, 1)}>
+        <tr :for={{row, i} <- Enum.with_index(@matrix, 1)}>
           <th class="board-cell-label">{i}</th>
           <td
             :for={{cell, j} <- Enum.with_index(row, 1)}
             class={"board-cell #{if cell == 0, do: "board-cell-light", else: "board-cell-dark"}"}
-            phx-click="toggle"
+            phx-click={if @toggleable, do: "toggle"}
             phx-value-i={i - 1}
             phx-value-j={j - 1}
-            style="cursor: pointer;"
+            style={"cursor: #{if @toggleable, do: "pointer", else: "default"};"}
           >
           </td>
         </tr>

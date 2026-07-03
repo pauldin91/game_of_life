@@ -2,7 +2,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
   use GameOfLifeWeb, :live_view
   import GameOfLifeWeb.CustomComponents
 
-  @default_size 5
+  @default_size 36
   @default_delay 500
   @default_mode "random"
   @modes [{"Random", "random"}, {"Custom", "custom"}]
