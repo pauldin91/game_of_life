@@ -24,4 +24,34 @@ defmodule GameOfLifeWeb.CustomComponents do
     </div>
     """
   end
+
+  attr :matrix, :any, required: true
+
+  @spec board(map()) :: Phoenix.LiveView.Rendered.t()
+  def board(assigns) do
+    ~H"""
+    <table class="board-table">
+      <thead>
+        <tr>
+          <th class="board-cell-label"></th>
+          <th :for={i <- 1..Enum.count(@board)} class="board-cell-label">{i}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr :for={{row, i} <- Enum.with_index(@board, 1)}>
+          <th class="board-cell-label">{i}</th>
+          <td
+            :for={{cell, j} <- Enum.with_index(row, 1)}
+            class={"board-cell #{if cell == 0, do: "board-cell-light", else: "board-cell-dark"}"}
+            phx-click="toggle"
+            phx-value-i={i - 1}
+            phx-value-j={j - 1}
+            style="cursor: pointer;"
+          >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    """
+  end
 end
