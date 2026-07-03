@@ -2,8 +2,8 @@
 
 To start your Phoenix server:
 
-* Run `mix setup` to install and setup dependencies
-* Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+- Run `mix setup` to install and setup dependencies
+- Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
@@ -12,8 +12,9 @@ Ready to run in production? Please [check our deployment guides](https://phoenix
 A simple implementation of Conway's Game Of Life with LiveView UI.
 
 ## Features
+
     - Chessboard like front-end with color annotations for living/dead cells
-    - Dynamic board size 
+    - Dynamic board size
     - Dynamic delay of board updates
     - Toggle pixel feature
     - Start/Reset Buttons
@@ -24,7 +25,6 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
   <img src="sample/sample-1.png" >
 </p>
 
-
 <p align="center">
   <img src="sample/sample-2.png" >
 </p>
@@ -32,16 +32,16 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
 ## TODOs
 
 ### Features to be added later
-    - Statistics
-    - Patterns
-    - Variations
-    - Modes
 
+    - Statistics (generation,alive etc.)
+    - Drag & drop Patterns on Board
+    - Game Variations (HighLife etc.)
+    - Modes (random,custom etc.)
 
 ## Learn more
 
-* Official website: https://www.phoenixframework.org/
-* Guides: https://phoenix.hexdocs.pm/overview.html
-* Docs: https://phoenix.hexdocs.pm
-* Forum: https://elixirforum.com/c/phoenix-forum
-* Source: https://github.com/phoenixframework/phoenix
+- Official website: https://www.phoenixframework.org/
+- Guides: https://phoenix.hexdocs.pm/overview.html
+- Docs: https://phoenix.hexdocs.pm
+- Forum: https://elixirforum.com/c/phoenix-forum
+- Source: https://github.com/phoenixframework/phoenix
