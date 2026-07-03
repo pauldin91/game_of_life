@@ -4,6 +4,9 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   @default_size 36
   @default_delay 500
+  @left_col_width 220
+  @gap 64
+  @padding 48
   @default_mode "random"
   @modes [{"Random", "random"}, {"Custom", "custom"}]
 
@@ -19,7 +22,8 @@ defmodule GameOfLifeWeb.GameLive.Index do
      |> assign_new(:selected_mode, fn -> @default_mode end)
      |> assign(:running, false)
      |> assign(:patterns_pid, patterns_pid)
-     |> assign(:board, GameOfLife.Board.new_board(@default_size, @default_mode))}
+     |> assign(:board, GameOfLife.Board.new_board(@default_size, @default_mode))
+     |> assign(:board_px, 600)}
   end
 
   @impl true
@@ -75,6 +79,12 @@ defmodule GameOfLifeWeb.GameLive.Index do
        )}
 
   @impl true
+  def handle_event("screen_size", %{"width" => w, "height" => h}, socket) do
+    board_px = compute_board_px(w, h)
+    {:noreply, assign(socket, :board_px, board_px)}
+  end
+
+  @impl true
   def handle_info(:reset, socket), do: {:noreply, do_reset(socket)}
 
   @impl true
@@ -108,5 +118,11 @@ defmodule GameOfLifeWeb.GameLive.Index do
     else
       Process.send_after(self(), :tick, socket.assigns.delay)
     end
+  end
+
+  defp compute_board_px(screen_w, screen_h) do
+    available_w = screen_w - @left_col_width - @gap - @padding
+    available_h = screen_h - @padding
+    min(available_w, available_h)
   end
 end
