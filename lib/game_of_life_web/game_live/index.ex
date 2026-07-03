@@ -9,6 +9,8 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    {:ok, patterns_pid} = GameOfLife.Patterns.start_link([])
+
     {:ok,
      socket
      |> assign_new(:size, fn -> @default_size end)
@@ -16,6 +18,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
      |> assign_new(:modes, fn -> @modes end)
      |> assign_new(:selected_mode, fn -> @default_mode end)
      |> assign(:running, false)
+     |> assign(:patterns_pid, patterns_pid)
      |> assign(:board, GameOfLife.Board.new_board(@default_size, @default_mode))}
   end
 

@@ -1,56 +1,28 @@
 defmodule GameOfLife.Patterns do
-  @block [[1, 1], [1, 1]]
+  use GenServer
 
-  @beehive [
-    [0, 1, 1, 0],
-    [1, 0, 0, 1],
-    [0, 1, 1, 0]
-  ]
+  def start_link(_opts), do: GenServer.start_link(__MODULE__, [])
 
-  @loaf [
-    [0, 1, 1, 0],
-    [1, 0, 0, 1],
-    [0, 1, 0, 1],
-    [0, 0, 1, 0]
-  ]
+  def all(pid), do: GenServer.call(pid, :all)
+  def get(pid, pattern), do: GenServer.call(pid, {:get, pattern})
 
-  @tub [
-    [0, 1, 0],
-    [1, 0, 1],
-    [0, 1, 0]
-  ]
+  @impl true
+  def init(_opts) do
+    dbg(File.cwd())
 
-  @blinker [[1, 1, 1]]
+    with {:ok, contents} <- File.read("patterns.json"),
+         {:ok, serialized} <- Jason.decode(contents) do
+      {:ok, serialized |> Map.new()}
+    end
+  end
 
-  @toad [
-    [0, 0, 1, 1, 1, 0],
-    [0, 1, 1, 1, 0, 0]
-  ]
+  @impl true
+  def handle_call({:get, pattern}, _from, state) do
+    {:reply, Map.get(state, pattern), state}
+  end
 
-  @beacon [
-    [1, 1, 0, 0],
-    [1, 1, 0, 0],
-    [0, 0, 1, 1],
-    [0, 0, 1, 1]
-  ]
-  @glider [[0, 0, 1], [1, 0, 1], [0, 1, 1]]
-
-  # still
-  def block(), do: @block
-
-  def beehive(), do: @beehive
-
-  def loaf(), do: @loaf
-
-  def tub(), do: @tub
-
-  # oscilators
-  def blinker(), do: @blinker
-
-  def toad(), do: @toad
-
-  def beacon(), do: @beacon
-
-  # spaceships
-  def glider(), do: @glider
+  @impl true
+  def handle_call(:all, _from, patterns) do
+    {:reply, patterns, patterns}
+  end
 end

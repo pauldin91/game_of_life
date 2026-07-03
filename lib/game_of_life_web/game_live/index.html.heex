@@ -3,65 +3,64 @@
     <h1 class="text-2xl font-bold tracking-tight">Conway's Game of Life</h1>
   </div>
 
-  <div class="flex flex-row gap-8 justify-center items-start p-6">
-    <!-- left column: small boards -->
-    <div class="flex flex-col gap-4 items-center overflow-y-auto max-h-screen">
-      <.board matrix={GameOfLife.Patterns.block()} />
-      <.board matrix={GameOfLife.Patterns.beehive()} />
-      <.board matrix={GameOfLife.Patterns.loaf()} />
-      <.board matrix={GameOfLife.Patterns.tub()} />
-      <.board matrix={GameOfLife.Patterns.blinker()} />
-      <.board matrix={GameOfLife.Patterns.toad()} />
-      <.board matrix={GameOfLife.Patterns.beacon()} />
-      <.board matrix={GameOfLife.Patterns.glider()} />
-    </div>
+  <div class="flex flex-row gap-8 justify-center items-center p-6">
+    <div class="flex flex-col gap-4 items-center justify-center">
+      <.render_prop_input entry={
+        %{name: "delay", value: @delay, default: @delay, min: 50, max: 2000, step: 50}
+      } />
+      <.render_prop_input entry={
+        %{name: "size", value: @size, default: @size, min: 3, max: 64, step: 1}
+      } />
+      <form class="max-w-sm mx-auto" phx-change="select_mode">
+        <label for="mode-select" class="block mb-2.5 text-sm font-medium text-heading">
+          Select mode
+        </label>
+        <select
+          id="mode-select"
+          name="selected_mode"
+          class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
+        >
+          <option
+            :for={{label, value} <- @modes}
+            value={value}
+            selected={value == @selected_mode}
+          >
+            {label}
+          </option>
+        </select>
+      </form>
 
+      <div class="flex flex-row justify-center items-center gap-4">
+        <%= if @running do %>
+          <.button phx-click="pause">
+            <.icon name="hero-pause-circle" class="w-7 h-7" />
+          </.button>
+        <% else %>
+          <.button phx-click="start">
+            <.icon name="hero-play-circle" class="w-7 h-7" />
+          </.button>
+        <% end %>
+        <.button phx-click="reset">
+          <.icon name="hero-arrow-path" class="w-7 h-7" />
+        </.button>
+      </div>
+    </div>
     <!-- right column: main board -->
     <div class="flex items-center justify-center">
       <.board matrix={@board} toggleable />
     </div>
+
+    <!-- left column: small boards -->
+    <div class="flex flex-col gap-4 items-center overflow-y-auto max-h-screen">
+      <div
+        :for={{l, v} <- GameOfLife.Patterns.all(@patterns_pid)}
+        class="flex flex-col items-center gap-1"
+      >
+        <span class="text-sm font-medium text-gray-500">{l}</span>
+        <.board matrix={v} />
+      </div>
+    </div>
   </div>
 
   <.flash kind={:info} flash={@flash} />
-  <div class="flex flex-col items-center gap-4 p-6">
-    <div class="flex flex-row justify-center items-center gap-4">
-      <%= if @running do %>
-        <.button phx-click="pause">
-          <.icon name="hero-pause-circle" class="w-7 h-7" />
-        </.button>
-      <% else %>
-        <.button phx-click="start">
-          <.icon name="hero-play-circle" class="w-7 h-7" />
-        </.button>
-      <% end %>
-      <.button phx-click="reset">
-        <.icon name="hero-arrow-path" class="w-7 h-7" />
-      </.button>
-    </div>
-
-    <.render_prop_input entry={
-      %{name: "delay", value: @delay, default: @delay, min: 50, max: 2000, step: 50}
-    } />
-    <.render_prop_input entry={
-      %{name: "size", value: @size, default: @size, min: 3, max: 64, step: 1}
-    } />
-    <form class="max-w-sm mx-auto" phx-change="select_mode">
-      <label for="mode-select" class="block mb-2.5 text-sm font-medium text-heading">
-        Select mode
-      </label>
-      <select
-        id="mode-select"
-        name="selected_mode"
-        class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
-      >
-        <option
-          :for={{label, value} <- @modes}
-          value={value}
-          selected={value == @selected_mode}
-        >
-          {label}
-        </option>
-      </select>
-    </form>
-  </div>
 </div>
