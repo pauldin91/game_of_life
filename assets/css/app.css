@@ -103,13 +103,25 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 /* Make LiveView wrapper divs transparent for layout */
-[data-phx-session], [data-phx-teleported-src] { display: contents }
+[data-phx-session],
+[data-phx-teleported-src] {
+  display: contents
+}
 
 /* This file is for your main application CSS */
 
 
 .board-table {
   border-collapse: collapse;
+}
+
+.board-table-dropzone {
+  border-collapse: collapse;
+  border: 2px dashed;
+  border-color: var(--fallback-b3, oklch(var(--b3)));
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .board-cell-label {
@@ -129,9 +141,22 @@
   border: 1px solid #374151;
 }
 
-.board-cell-light { background-color: #f0d9b5; }
-.board-cell-dark  { background-color: #b58863; }
+.board-cell-light {
+  background-color: #f0d9b5;
+}
 
-[data-theme=dark] .board-cell { border-color: #6b7280; }
-[data-theme=dark] .board-cell-light { background-color: #b8966e; }
-[data-theme=dark] .board-cell-dark  { background-color: #6b4c2a; }
+.board-cell-dark {
+  background-color: #b58863;
+}
+
+[data-theme=dark] .board-cell {
+  border-color: #6b7280;
+}
+
+[data-theme=dark] .board-cell-light {
+  background-color: #b8966e;
+}
+
+[data-theme=dark] .board-cell-dark {
+  background-color: #6b4c2a;
+}
