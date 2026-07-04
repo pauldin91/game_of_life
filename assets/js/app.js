@@ -40,6 +40,28 @@ Hooks.ScreenSize = {
   },
 };
 
+Hooks.BoardDropzone = {
+  mounted() {
+    this.el.addEventListener("dragover", (e) => {
+      e.preventDefault(); // Required to allow dropping
+    });
+
+    this.el.addEventListener("drop", (e) => {
+      e.preventDefault();
+
+      const pattern = e.dataTransfer.getData("pattern");
+
+      this.pushEvent("drop_pattern", {
+        pattern: pattern,
+        x: e.offsetX,
+        y: e.offsetY
+      });
+    });
+  }
+}
+
+
+
 const csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
