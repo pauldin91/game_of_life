@@ -17,6 +17,49 @@ defmodule GameOfLife.Board do
     end)
   end
 
+  def drop(matrix, i, j, pattern) do
+    size = length(matrix)
+    pt = length(pattern)
+
+    cond do
+      size > i - 1 + pt && size > j - 1 + pt ->
+        do_replace(matrix, i, j, pattern)
+
+      true ->
+        {:error, "out of bounds"}
+    end
+  end
+
+  def do_replace(matrix, i, j, pattern) do
+    size = length(matrix)
+    patterns_size = length(pattern)
+    pat = make_map(pattern, patterns_size)
+    mat = make_map(matrix, size)
+
+    res =
+      Enum.map(mat, fn {x, y} ->
+        repl = Map.get(pat, x, nil)
+
+        cond do
+          repl == nil -> {x, y}
+          true -> {x, repl}
+        end
+      end)
+      |> Enum.sort(fn e1, e2 -> elem(e1, 0) < elem(e2, 0) end)
+      |> Enum.map(fn {_i, v} -> v end)
+      |> Enum.chunk_every(size)
+
+    {:ok, res}
+  end
+
+  defp make_map(matrix, size),
+    do:
+      Enum.zip(
+        0..(size * size - 1),
+        Enum.reduce(matrix, [], fn x, acc -> acc ++ x end)
+      )
+      |> Map.new()
+
   def alive(matrix), do: Enum.reduce(matrix, 0, fn x, acc -> acc + Enum.sum(x) end)
 
   def game_over?(matrix) do

@@ -64,6 +64,21 @@ defmodule GameOfLifeWeb.GameLive.Index do
   end
 
   @impl true
+  def handle_event("drop_pattern", %{"i" => i, "j" => j, "pattern" => pattern}, socket) do
+    case GameOfLife.Board.drop(socket.assigns.board, i, j, pattern) do
+      {:ok, board} ->
+        {:noreply,
+         socket
+         |> assign(:board, board)}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, reason)}
+    end
+  end
+
+  def handle_event("drop_pattern", _params, socket), do: {:noreply, socket}
+
+  @impl true
   def handle_event("toggle", %{"i" => i, "j" => j}, socket),
     do:
       {:noreply,
