@@ -49,9 +49,18 @@
             class="flex flex-col gap-2 items-center"
           >
             <span class="text-sm font-semibold text-gray-700">{cat}</span>
-            <div :for={{l, p} <- v} class="flex flex-col items-center gap-1">
+            <div
+              :for={{l, p} <- v}
+              class="flex flex-col items-center gap-1"
+            >
               <span class="text-xs font-medium text-gray-500">{l}</span>
-              <div id="draggable-pattern" draggable="true" phx-hook="Pattern">
+
+              <div
+                id={"pattern-#{cat}-#{l}"}
+                draggable="true"
+                phx-hook="Pattern"
+                data-pattern={Jason.encode!(p)}
+              >
                 <.board matrix={p} />
               </div>
             </div>
@@ -64,7 +73,8 @@
     <div
       id="board-dropzone"
       phx-hook="BoardDropzone"
-      class="flex items-center justify-center overflow-auto border border-gray-200 rounded flex-shrink-0"
+      data-size={@size}
+      class="board-dropzone flex items-center justify-center overflow-auto border border-gray-200 rounded flex-shrink-0"
       style={"width: #{@board_px}px; height: #{@board_px}px;"}
     >
       <.board matrix={@board} toggleable />

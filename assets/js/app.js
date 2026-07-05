@@ -42,20 +42,56 @@ Hooks.ScreenSize = {
 
 Hooks.BoardDropzone = {
   mounted() {
+
     this.el.addEventListener("dragover", (e) => {
-      e.preventDefault(); // Required to allow dropping
+      e.preventDefault();
+      this.el.classList.add("drag-over");
+      e.dataTransfer.dropEffect = "copy";
+    });
+
+    this.el.addEventListener("dragleave", () => {
+      this.el.classList.remove("drag-over");
     });
 
     this.el.addEventListener("drop", (e) => {
       e.preventDefault();
+      this.el.classList.remove("drag-over");
 
-      const pattern = e.dataTransfer.getData("pattern");
+      const pattern =
+        JSON.parse(e.dataTransfer.getData("application/json"));
+
+      const rect = this.el.getBoundingClientRect();
+
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const size = Number(this.el.dataset.size);
+
+      const cellWidth = rect.width / size;
+      const cellHeight = rect.height / size;
+
+      const j = Math.floor(x / cellWidth);
+      const i = Math.floor(y / cellHeight);
 
       this.pushEvent("drop_pattern", {
-        pattern: pattern,
-        x: e.offsetX,
-        y: e.offsetY
+        i,
+        j,
+        pattern
       });
+    });
+
+  }
+}
+
+Hooks.Pattern = {
+  mounted() {
+    this.el.addEventListener("dragstart", (e) => {
+      e.dataTransfer.effectAllowed = "copy";
+
+      e.dataTransfer.setData(
+        "application/json",
+        this.el.dataset.pattern
+      );
     });
   }
 }
