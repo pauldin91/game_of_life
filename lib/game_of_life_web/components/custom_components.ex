@@ -31,7 +31,15 @@ defmodule GameOfLifeWeb.CustomComponents do
 
   def board(assigns) do
     ~H"""
-    <table class={if @dropzone == 0, do: "board-table-dropzone", else: "board-table"}>
+    <table
+      id={if @dropzone, do: "board-dropzone"}
+      phx-hook={if @dropzone, do: "BoardDropzone"}
+      data-size={length(@matrix)}
+      class={[
+        "board-table",
+        @dropzone && "board-dropzone"
+      ]}
+    >
       <thead>
         <tr>
           <th class="board-cell-label"></th>
@@ -54,17 +62,5 @@ defmodule GameOfLifeWeb.CustomComponents do
       </tbody>
     </table>
     """
-  end
-
-  def dropzone(assigns) do
-    ~H"""
-    <div phx-hook="Drag" id="drag"> <!-- Here is our div with phx-hook and id attrs -->
-    <div class="dropzone grid gap-3" id="pool">
-        <%= for %{text: text, id: id} <- @pool do %>
-        <div draggable="true" id="draggable" class="draggable p-4 bg-blue-700 text-white"><%= text %></div>
-        <% end %>
-    </div>
-    </div>
-  """
   end
 end

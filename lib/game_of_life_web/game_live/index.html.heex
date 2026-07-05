@@ -70,14 +70,8 @@
     </div>
 
     <!-- main board: scrollable if board exceeds board_px -->
-    <div
-      id="board-dropzone"
-      phx-hook="BoardDropzone"
-      data-size={@size}
-      class="board-dropzone flex items-center justify-center overflow-auto border border-gray-200 rounded flex-shrink-0"
-      style={"width: #{@board_px}px; height: #{@board_px}px;"}
-    >
-      <.board matrix={@board} toggleable />
+    <div style={"width: #{@board_px}px; height: #{@board_px}px;"}>
+      <.board matrix={@board} toggleable dropzone />
     </div>
   </div>
 
