@@ -115,13 +115,15 @@
   border-collapse: collapse;
 }
 
-.board-table-dropzone {
-  border-collapse: collapse;
-  border: 2px dashed;
-  border-color: var(--fallback-b3, oklch(var(--b3)));
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
+.board-dropzone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.board-dropzone.drag-over {
+  border-color: #2563eb;
+  background-color: #eff6ff;
 }
 
 .board-cell-label {
