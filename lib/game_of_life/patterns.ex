@@ -12,7 +12,7 @@ defmodule GameOfLife.Patterns do
 
     with {:ok, contents} <- File.read("patterns.json"),
          {:ok, serialized} <- Jason.decode(contents) do
-      {:ok, serialized |> Map.new()}
+      {:ok, serialized}
     end
   end
 
