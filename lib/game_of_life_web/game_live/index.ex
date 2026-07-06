@@ -7,7 +7,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
   @left_col_width 220
   @gap 64
   @padding 48
-  @default_mode "random"
+  @default_mode "custom"
   @modes [{"Random", "random"}, {"Custom", "custom"}]
 
   @impl true
