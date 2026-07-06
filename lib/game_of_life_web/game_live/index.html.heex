@@ -3,7 +3,7 @@
 
   <div class="flex flex-row gap-8 justify-center items-start" style={"height: #{@board_px}px;"}>
     <!-- left column: controls + patterns -->
-    <div class="flex flex-col gap-4 items-center h-full" style="width: 220px;">
+    <div class="flex flex-col gap-4 items-center h-full" style="width: 420px;">
       <!-- controls: fixed, never scroll -->
       <div class="flex flex-col gap-4 items-center w-full flex-shrink-0">
         <.render_prop_input entry={
@@ -43,7 +43,7 @@
 
       <!-- patterns: scrollable, takes remaining height -->
       <div class="w-full overflow-y-auto flex-1 min-h-0">
-        <div class="flex flex-col gap-6">
+        <div class="flex flex-row flex-wrap gap-6 justify-center items-start">
           <div
             :for={{cat, v} <- GameOfLife.Patterns.all(@patterns_pid)}
             class="flex flex-col gap-2 items-center"
