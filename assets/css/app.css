@@ -116,13 +116,12 @@
 }
 
 .board-dropzone {
-  border: 2px dashed #cbd5e1;
   border-radius: 8px;
   transition: border-color 0.2s, background-color 0.2s;
 }
 
 .board-dropzone.drag-over {
-  outline: 3px dashed #2563eb;
+  outline: 3px solid #2563eb;
   outline-offset: 4px;
 }
 

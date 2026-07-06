@@ -57,7 +57,7 @@ defmodule GameOfLife.Board do
         offset..(offset + length(matrix) * size - 1)
         |> Enum.chunk_every(size)
       )
-      |> Enum.map(fn {x, i} -> x |> Enum.map(fn y -> y + i * (global_mat_size - size) end) end)
+      |> Enum.map(fn {x, i} -> Enum.map(x, fn y -> y + i * (global_mat_size - size) end) end)
       |> Enum.reduce([], fn x, acc -> acc ++ x end),
       Enum.reduce(matrix, [], fn x, acc -> acc ++ x end)
     )

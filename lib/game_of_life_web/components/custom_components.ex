@@ -26,14 +26,18 @@ defmodule GameOfLifeWeb.CustomComponents do
   end
 
   attr :matrix, :any, required: true
+  attr :id, :string, required: true
   attr :toggleable, :boolean, default: false
   attr :dropzone, :boolean, default: false
+  attr :data, :string, default: ""
 
   def board(assigns) do
     ~H"""
     <table
-      id={if @dropzone, do: "board-dropzone"}
-      phx-hook={if @dropzone, do: "BoardDropzone"}
+      id={@id}
+      draggable={"#{!@dropzone}"}
+      phx-hook={if @dropzone, do: "BoardDropzone", else: "Pattern"}
+      data-pattern={if !@dropzone, do: @data}
       data-size={length(@matrix)}
       class={[
         "board-table",
@@ -43,18 +47,18 @@ defmodule GameOfLifeWeb.CustomComponents do
       <thead>
         <tr>
           <th class="board-cell-label"></th>
-          <th :for={i <- 1..Enum.count(@matrix)} class="board-cell-label">{i}</th>
+          <th :for={i <- 0..(Enum.count(@matrix)-1)} class="board-cell-label"></th>
         </tr>
       </thead>
       <tbody>
-        <tr :for={{row, i} <- Enum.with_index(@matrix, 1)}>
-          <th class="board-cell-label">{i}</th>
+        <tr :for={{row, i} <- Enum.with_index(@matrix, 0)}>
+          <th class="board-cell-label"></th>
           <td
-            :for={{cell, j} <- Enum.with_index(row, 1)}
+            :for={{cell, j} <- Enum.with_index(row, 0)}
             class={"board-cell #{if cell == 0, do: "board-cell-light", else: "board-cell-dark"}"}
             phx-click={if @toggleable, do: "toggle"}
-            phx-value-i={i - 1}
-            phx-value-j={j - 1}
+            phx-value-i={i}
+            phx-value-j={j}
             style={"cursor: #{if @toggleable, do: "pointer", else: "default"};"}
           >
           </td>

@@ -55,14 +55,7 @@
             >
               <span class="text-xs font-medium text-gray-500">{l}</span>
 
-              <div
-                id={"pattern-#{cat}-#{l}"}
-                draggable="true"
-                phx-hook="Pattern"
-                data-pattern={Jason.encode!(p)}
-              >
-                <.board matrix={p} />
-              </div>
+              <.board matrix={p} id={"pattern-#{cat}-#{l}"} data={Jason.encode!(p)} />
             </div>
           </div>
         </div>
@@ -71,7 +64,7 @@
 
     <!-- main board: scrollable if board exceeds board_px -->
     <div style={"width: #{@board_px}px; height: #{@board_px}px;"}>
-      <.board matrix={@board} toggleable dropzone />
+      <.board matrix={@board} id="board-dropzone" toggleable dropzone />
     </div>
   </div>
 
