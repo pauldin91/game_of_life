@@ -71,23 +71,13 @@ defmodule GameOfLife.Board do
       |> Map.new()
 
   defp make_map(matrix, size, {start, mat_size}) do
-    indices =
-      start..(start + length(matrix) * size - 1)
-      |> Enum.chunk_every(size)
-
-    dbg(size)
-    dbg(mat_size)
-    dbg(indices)
-
-    res =
-      Enum.with_index(indices)
-      |> Enum.map(fn {x, i} -> x |> Enum.map(fn y -> y + i * (mat_size - size) end) end)
-      |> Enum.reduce([], fn x, acc -> acc ++ x end)
-
-    dbg(res)
-
     Enum.zip(
-      res,
+      Enum.with_index(
+        start..(start + length(matrix) * size - 1)
+        |> Enum.chunk_every(size)
+      )
+      |> Enum.map(fn {x, i} -> x |> Enum.map(fn y -> y + i * (mat_size - size) end) end)
+      |> Enum.reduce([], fn x, acc -> acc ++ x end),
       Enum.reduce(matrix, [], fn x, acc -> acc ++ x end)
     )
     |> Map.new(fn {k, v} ->
