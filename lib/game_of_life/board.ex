@@ -18,22 +18,20 @@ defmodule GameOfLife.Board do
   end
 
   def drop(matrix, i, j, pattern) do
-    do_replace(matrix, i - 1, j - 1, pattern)
+    do_replace(matrix, i, j, pattern)
   end
 
   def do_replace(matrix, i, j, pattern) do
     size = Enum.count(Enum.at(matrix, 0))
-    patterns_size = Enum.count(Enum.at(pattern, 0))
 
     pat =
       make_map(
         pattern,
-        patterns_size,
-        i * size + j,
+        (i - 1) * size + j - 1,
         size
       )
 
-    mat = make_map(matrix, size, 0, size)
+    mat = make_map(matrix, 0, size)
 
     res =
       Enum.map(mat, fn {x, y} ->
@@ -51,7 +49,9 @@ defmodule GameOfLife.Board do
     {:ok, res}
   end
 
-  defp make_map(matrix, size, offset, global_mat_size) do
+  defp make_map(matrix, offset, global_mat_size) do
+    size = Enum.count(Enum.at(matrix, 0))
+
     Enum.zip(
       Enum.with_index(
         offset..(offset + length(matrix) * size - 1)
