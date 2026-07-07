@@ -1,4 +1,5 @@
 defmodule GameOfLife.Orchestrator do
+  alias GameOfLife.Orchestrator
   use GenServer
 
   defstruct [:size, :mode, :board, gen: 0, alive: 0]
@@ -16,7 +17,7 @@ defmodule GameOfLife.Orchestrator do
     board = GameOfLife.Board.new_board(size, mode)
 
     {:ok,
-     %__MODULE__{
+     %Orchestrator{
        size: size,
        mode: mode,
        board: board,
@@ -45,8 +46,8 @@ defmodule GameOfLife.Orchestrator do
   end
 
   @impl true
-  def handle_cast({:toggle, %{i: i, j: j}}, state) do
-    new_state = %__MODULE__{state | board: GameOfLife.Board.toggle_cell(state.board, i, j)}
+  def handle_cast({:toggle, %{i: i, j: j}}, %Orchestrator{} = state) do
+    new_state = %Orchestrator{state | board: GameOfLife.Board.toggle_cell(state.board, i, j)}
     {:noreply, new_state}
   end
 end

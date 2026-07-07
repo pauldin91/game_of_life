@@ -30,6 +30,7 @@ defmodule GameOfLifeWeb.CustomComponents do
   attr :toggleable, :boolean, default: false
   attr :dropzone, :boolean, default: false
   attr :data, :string, default: ""
+  attr :cell_px, :integer, default: nil
 
   def board(assigns) do
     ~H"""
@@ -43,23 +44,25 @@ defmodule GameOfLifeWeb.CustomComponents do
         "board-table",
         @dropzone && "board-dropzone"
       ]}
+      style={
+        if @cell_px, do: "table-layout: fixed; width: #{@cell_px * length(@matrix)}px;", else: ""
+      }
     >
-      <thead>
-        <tr>
-          <th class="board-cell-label"></th>
-          <th :for={i <- 0..(Enum.count(@matrix)-1)} class="board-cell-label"></th>
-        </tr>
-      </thead>
       <tbody>
         <tr :for={{row, i} <- Enum.with_index(@matrix, 0)}>
-          <th class="board-cell-label"></th>
           <td
             :for={{cell, j} <- Enum.with_index(row, 0)}
             class={"board-cell #{if cell == 0, do: "board-cell-light", else: "board-cell-dark"}"}
             phx-click={if @toggleable, do: "toggle"}
             phx-value-i={i}
             phx-value-j={j}
-            style={"cursor: #{if @toggleable, do: "pointer", else: "default"};"}
+            style={[
+              "cursor: #{if @toggleable, do: "pointer", else: "default"};",
+              if(@cell_px,
+                do: "width: #{@cell_px}px; height: #{@cell_px}px; min-width: #{@cell_px}px;",
+                else: ""
+              )
+            ]}
           >
           </td>
         </tr>

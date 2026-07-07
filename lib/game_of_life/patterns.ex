@@ -1,6 +1,8 @@
 defmodule GameOfLife.Patterns do
   use GenServer
 
+  @sorter %{"oscillators" => 1, "still" => 2, "spaceships" => 3}
+
   def start_link(_opts), do: GenServer.start_link(__MODULE__, [])
 
   def all(pid), do: GenServer.call(pid, :all)
@@ -8,11 +10,11 @@ defmodule GameOfLife.Patterns do
 
   @impl true
   def init(_opts) do
-    dbg(File.cwd())
-
     with {:ok, contents} <- File.read("patterns.json"),
          {:ok, serialized} <- Jason.decode(contents) do
-      {:ok, serialized}
+      {:ok,
+       serialized
+       |> Enum.sort(fn x,y -> Map.get(@sorter,elem(x,0),0) > Map.get(@sorter,elem(y,0),0)  end)}
     end
   end
 
