@@ -1,9 +1,8 @@
-<div class="flex flex-col items-center gap-4 p-6 h-screen overflow-hidden" id="screen-size-hook" phx-hook="ScreenSize">
-  <h1 class="text-2xl font-bold tracking-tight">Conway's Game of Life</h1>
+<div class="game-layout" id="screen-size-hook" phx-hook="ScreenSize">
+  <h1 class="game-title">Conway's Game of Life</h1>
 
-  <!-- controls bar: now at top, below title -->
-  <div class="flex flex-col gap-4 items-center w-full flex-shrink-0">
-    <div class="flex flex-row flex-wrap gap-8 justify-center items-end w-full">
+  <div class="controls-bar">
+    <div class="controls-row">
       <.render_prop_input entry={
         %{name: "delay", value: @delay, default: @delay, min: 50, max: 2000, step: 50}
       } />
@@ -11,13 +10,9 @@
         %{name: "size", value: @size, default: @size, min: 5, max: @max_size, step: 1}
       } />
 
-      <form class="w-full max-w-xs" phx-change="select_mode">
-        <label for="mode-select" class="block mb-2 text-sm font-medium">Select mode</label>
-        <select
-          id="mode-select"
-          name="selected_mode"
-          class="block w-full px-3 py-2 border text-sm rounded"
-        >
+      <form class="mode-select-form" phx-change="select_mode">
+        <label for="mode-select" class="mode-select-label">Select mode</label>
+        <select id="mode-select" name="selected_mode" class="mode-select">
           <option
             :for={{label, value} <- @modes}
             value={value}
@@ -29,7 +24,7 @@
       </form>
     </div>
 
-    <div class="flex flex-row justify-center items-center gap-4">
+    <div class="controls-actions">
       <.button :if={@running} phx-click="pause">
         <.icon name="hero-pause-circle" class="w-7 h-7" />
       </.button>
@@ -42,32 +37,25 @@
     </div>
   </div>
 
-  <!-- patterns + board row -->
   <div
-    class="grid gap-8 justify-center items-start w-full"
+    class="board-grid"
     style={"grid-template-columns: 520px #{@board_px}px 520px; height: #{@board_px}px;"}
   >
-    <!-- left column: patterns only, scrollable -->
-    <!-- left column: masonry-style pattern stacking -->
-    <div class="w-full h-full overflow-y-auto min-h-0">
-      <div class="columns-2 gap-6 [column-fill:_balance]">
+    <div class="patterns-column">
+      <div class="patterns-masonry">
         <div
           :for={{cat, v} <- GameOfLife.Patterns.all(@patterns_pid)}
-          class="break-inside-avoid mb-6 flex flex-col gap-2 items-center"
+          class="pattern-category"
         >
-          <span class="text-sm font-semibold text-gray-700">{cat}</span>
-          <div
-            :for={{l, p} <- v}
-            class="break-inside-avoid mb-4 flex flex-col items-center gap-1"
-          >
-            <span class="text-xs font-medium text-gray-500">{l}</span>
-            <.board matrix={p} id={"pattern-#{cat}-#{l}"} data={Jason.encode!(p)} />
+          <span class="pattern-category-label">{cat}</span>
+          <div :for={{l, p} <- v} class="pattern-item">
+            <span class="pattern-item-label">{l}</span>
+            <.board matrix={p} id={"pattern-#{cat}-#{l}"} data={Jason.encode!(p)} cell_px={@cell_px} />
           </div>
         </div>
       </div>
     </div>
 
-    <!-- center: main board, truly centered thanks to the right-hand spacer -->
     <div style={"width: #{@board_px}px; height: #{@board_px}px;"}>
       <.board
         matrix={@board}
