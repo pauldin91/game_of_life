@@ -65,6 +65,8 @@ defmodule GameOfLife.Orchestrator do
       0..(size - 1)
       |> Enum.map(fn _ -> :rand.uniform(2) - 1 end)
     end)
+    |> Enum.reduce([], fn x, acc -> acc ++ x end)
+    |> make_map(0,size)
   end
 
   def drop(matrix, i, j, pattern) do
