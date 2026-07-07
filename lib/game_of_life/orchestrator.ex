@@ -60,13 +60,14 @@ defmodule GameOfLife.Orchestrator do
   end
 
   def new_board(size, "random") do
-    0..(size - 1)
-    |> Enum.map(fn _ ->
-      0..(size - 1)
-      |> Enum.map(fn _ -> :rand.uniform(2) - 1 end)
-    end)
-    |> Enum.reduce([], fn x, acc -> acc ++ x end)
-    |> make_map(0,size)
+    r = 0..(size * size - 1)
+
+    Enum.zip(
+      r,
+      Enum.map(r, fn _ -> :rand.uniform(2) - 1 end)
+    )
+    |> Enum.filter(fn {_x, y} -> y == 1 end)
+    |> Map.new()
   end
 
   def drop(matrix, i, j, pattern) do

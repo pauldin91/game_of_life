@@ -26,7 +26,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
      |> assign_new(:selected_mode, fn -> @default_mode end)
      |> assign(:running, false)
      |> assign(:patterns_pid, patterns_pid)
-     |> assign(:board, GameOfLife.Board.new_board(@default_size, @default_mode))
+     |> assign(:board, GameOfLife.Orchestrator.new_board(@default_size, "random"))
      |> assign(:max_board_px, max_board_px)
      |> assign(:max_size, max_board_px)
      |> assign(:board_px, board_dims(@default_size, max_board_px))

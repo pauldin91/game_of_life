@@ -26,6 +26,7 @@ defmodule GameOfLifeWeb.CustomComponents do
   end
 
   attr :matrix, :any, required: true
+  attr :size, :integer, required: true
   attr :id, :string, required: true
   attr :toggleable, :boolean, default: false
   attr :dropzone, :boolean, default: false
@@ -39,14 +40,14 @@ defmodule GameOfLifeWeb.CustomComponents do
       draggable={"#{!@dropzone}"}
       phx-hook={if @dropzone, do: "BoardDropzone", else: "Pattern"}
       data-pattern={if !@dropzone, do: @data}
-      data-size={length(@matrix)}
+      data-size={@size}
       class={[
         "board-table",
         @dropzone && "board-dropzone"
       ]}
       style={
         if @cell_px do
-          cols = if(@matrix == [], do: 0, else: length(hd(@matrix)))
+          cols = if(@matrix == %{}, do: 0, else: @size)
           "width: #{@cell_px * cols}px;"
         else
           ""
@@ -54,11 +55,15 @@ defmodule GameOfLifeWeb.CustomComponents do
       }
     >
       <tbody>
-        <tr :for={{row, i} <- Enum.with_index(@matrix, 0)}>
+        <tr :for={i <- 0..(@size - 1)}>
           <td
-            :for={{cell, j} <- Enum.with_index(row, 0)}
-            class={["board-cell",
-              if(cell == 0, do: "board-cell-light", else: "board-cell-dark"),
+            :for={j <- 0..(@size - 1)}
+            class={[
+              "board-cell",
+              if(Map.get(@matrix, i * @size + j, nil) == nil,
+                do: "board-cell-light",
+                else: "board-cell-dark"
+              ),
               if(@toggleable, do: "board-cell-toggleable", else: "board-cell-static")
             ]}
             phx-click={if @toggleable, do: "toggle"}

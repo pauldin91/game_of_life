@@ -41,7 +41,7 @@
     class="board-grid"
     style={"grid-template-columns: 520px #{@board_px}px 520px; height: #{@board_px}px;"}
   >
-    <div class="patterns-column">
+    <%!-- <div class="patterns-column">
       <div class="patterns-masonry">
         <div
           :for={{cat, v} <- GameOfLife.Patterns.all(@patterns_pid)}
@@ -54,11 +54,12 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> --%>
 
     <div style={"width: #{@board_px}px; height: #{@board_px}px;"}>
       <.board
         matrix={@board}
+        size={@size}
         id="board-dropzone"
         toggleable
         dropzone
