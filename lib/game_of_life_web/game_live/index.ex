@@ -8,7 +8,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
   @gap 64
   @padding 48
   @controls_h 160
-  @default_mode "custom"
+  @default_mode "random"
   @modes [{"Random", "random"}, {"Custom", "custom"}]
   @initial_cell_px 20
   @phase2_threshold 48
@@ -16,7 +16,10 @@ defmodule GameOfLifeWeb.GameLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     {:ok, patterns_pid} = GameOfLife.Patterns.start_link([])
-    {:ok,board_pid}=GameOfLife.Orchestrator.start_link([size: @default_size,mode:  "random"])
+
+    {:ok, board_pid} =
+      GameOfLife.Orchestrator.start_link(size: @default_size, mode: @default_mode)
+
     max_board_px = min(600, @phase2_threshold * @initial_cell_px)
 
     {:ok,
@@ -75,19 +78,27 @@ defmodule GameOfLifeWeb.GameLive.Index do
   def handle_event("start", _params, socket), do: {:noreply, socket}
 
   def handle_event("select_mode", %{"selected_mode" => mode}, socket) do
+    {:ok, pid} = GameOfLife.Orchestrator.start_link(size: socket.assigns.size, mode: mode)
+
     {:noreply,
      socket
      |> assign(:selected_mode, mode)
-     |> assign(:board, GameOfLife.Board.new_board(socket.assigns.size, mode))}
+     |> assign(:board_pid, pid)
+     |> assign(:board, GameOfLife.Orchestrator.board(pid))}
   end
 
   @impl true
   def handle_event("drop_pattern", %{"i" => i, "j" => j, "pattern" => pattern}, socket) do
-    {:ok, board} = GameOfLife.Board.drop(socket.assigns.board, i, j, pattern)
-
     {:noreply,
      socket
-     |> assign(:board, board)}
+     |> assign(
+       :board,
+       GameOfLife.Orchestrator.drop(socket.assigns.board_pid, %{
+         "i" => i,
+         "j" => j,
+         "pattern" => pattern
+       })
+     )}
   end
 
   def handle_event("drop_pattern", _params, socket), do: {:noreply, socket}
@@ -99,10 +110,9 @@ defmodule GameOfLifeWeb.GameLive.Index do
        socket
        |> assign(
          :board,
-         GameOfLife.Board.toggle_cell(
-           socket.assigns.board,
-           String.to_integer(i),
-           String.to_integer(j)
+         GameOfLife.Orchestrator.toggle_cell(
+           socket.assigns.board_pid,
+           %{"i" => String.to_integer(i), "j" => String.to_integer(j)}
          )
        )}
 
@@ -141,11 +151,18 @@ defmodule GameOfLifeWeb.GameLive.Index do
   end
 
   defp do_reset(socket) do
+    {:ok, board_pid} =
+      GameOfLife.Orchestrator.start_link(
+        size: socket.assigns.size,
+        mode: socket.assigns.selected_mode
+      )
+
     socket
     |> assign(
-      :board,
-      GameOfLife.Board.new_board(socket.assigns.size, socket.assigns.selected_mode)
+      :board_pid,
+      board_pid
     )
+    |> assign(:board, GameOfLife.Orchestrator.board(board_pid))
     |> assign(:running, false)
   end
 

@@ -10,9 +10,11 @@ defmodule GameOfLife.Orchestrator do
   def board(pid), do: GenServer.call(pid, :board)
   def gameover?(pid), do: GenServer.call(pid, :gameover)
   def alive(pid), do: GenServer.call(pid, :alive)
-  def σιζε(pid, size), do: GenServer.cast(pid, {:size, size})
-  def toggle_cell(pid, i, j), do: GenServer.cast(pid, {:toggle, %{i: i, j: j}})
-  def drop(pid, %{i: _i, j: _j, pattern: _pattern} = item), do: GenServer.cast(pid, {:drop, item})
+  def size(pid, size), do: GenServer.cast(pid, {:size, size})
+  def toggle_cell(pid, %{"i" => i, "j" => j} = cell), do: GenServer.cast(pid, {:toggle, cell})
+
+  def drop(pid, %{"i" => _i, "j" => _j, "pattern" => _pattern} = item),
+    do: GenServer.cast(pid, {:drop, item})
 
   @impl true
   def init(opts) do
@@ -37,28 +39,28 @@ defmodule GameOfLife.Orchestrator do
 
   @impl true
   def handle_call(:next, _from, %__MODULE__{} = state) do
-    dbg(state.board)
+    keys =
+      Map.keys(state.board)
+      |> Enum.flat_map(&indices(&1, state.size))
+      |> Enum.uniq()
 
     board =
-      Enum.map(state.board, fn
-        {k, v} ->
-          total = calculate_cell(state.board, k, state.size)
+      Enum.flat_map(keys, fn k ->
+        v = Map.get(state.board, k, 0)
+        total = calculate_cell(state.board, k, state.size)
 
-          cond do
-            total == 3 -> {k, 1}
-            2 <= total and total <= 3 and v == 1 -> {k, v}
-            true -> {k, 0}
-          end
+        cond do
+          total == 3 -> [{k, 1}]
+          total == 2 and v == 1 -> [{k, 1}]
+          true -> []
+        end
       end)
-      |> Enum.filter(fn {_k, v} -> v == 1 end)
       |> Map.new()
-
-    dbg(board)
 
     new_state = %__MODULE__{
       state
       | board: board,
-        alive: Enum.count(state.board),
+        alive: Enum.count(board),
         gen: state.gen + 1
     }
 
@@ -76,17 +78,15 @@ defmodule GameOfLife.Orchestrator do
   end
 
   @impl true
-  def handle_cast({:toggle, %{i: i, j: j}}, %Orchestrator{} = state) do
-    board =
-      Map.update(state.board, i * state.size + j, nil, fn {_x, y} ->
-        cond do
-          1 - y == 1 -> 1
-          true -> nil
-        end
-      end)
+  def handle_cast({:toggle, %{"i" => i, "j" => j}}, %Orchestrator{} = state) do
+    key = i * state.size + j
 
-    new_state = %Orchestrator{state | board: board}
-    {:noreply, new_state}
+    board =
+      if Map.has_key?(state.board, key),
+        do: Map.delete(state.board, key),
+        else: Map.put(state.board, key, 1)
+
+    {:noreply, %Orchestrator{state | board: board}}
   end
 
   @impl true
@@ -95,7 +95,7 @@ defmodule GameOfLife.Orchestrator do
   end
 
   @impl true
-  def handle_cast({:drop, %{i: _i, j: _j, pattern: _pattern}}, %Orchestrator{} = state) do
+  def handle_cast({:drop, %{"i" => _i, "j" => _j, "pattern" => _pattern}}, %Orchestrator{} = state) do
     {:noreply, %Orchestrator{state | board: state.board}}
   end
 
@@ -128,7 +128,7 @@ defmodule GameOfLife.Orchestrator do
         r == 0 -> right
         r == size - 1 -> left
         true -> left ++ right
-      end
+    end
   end
 
   defp calculate_cell(the_map, i, size) do
