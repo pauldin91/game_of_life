@@ -16,6 +16,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     {:ok, patterns_pid} = GameOfLife.Patterns.start_link([])
+    {:ok,board_pid}=GameOfLife.Orchestrator.start_link([size: @default_size,mode:  "random"])
     max_board_px = min(600, @phase2_threshold * @initial_cell_px)
 
     {:ok,
@@ -26,7 +27,8 @@ defmodule GameOfLifeWeb.GameLive.Index do
      |> assign_new(:selected_mode, fn -> @default_mode end)
      |> assign(:running, false)
      |> assign(:patterns_pid, patterns_pid)
-     |> assign(:board, GameOfLife.Orchestrator.new_board(@default_size, "random"))
+     |> assign(:board_pid, board_pid)
+     |> assign(:board, GameOfLife.Orchestrator.board(board_pid))
      |> assign(:max_board_px, max_board_px)
      |> assign(:max_size, max_board_px)
      |> assign(:board_px, board_dims(@default_size, max_board_px))
@@ -127,7 +129,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   def handle_info(:tick, %{assigns: %{running: true}} = socket) do
     schedule_tick(socket)
-    {:noreply, assign(socket, :board, GameOfLife.Engine.tick(socket.assigns.board))}
+    {:noreply, assign(socket, :board, GameOfLife.Orchestrator.next(socket.assigns.board_pid))}
   end
 
   @impl true
@@ -148,7 +150,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
   end
 
   defp schedule_tick(socket) do
-    if GameOfLife.Board.game_over?(socket.assigns.board) do
+    if GameOfLife.Orchestrator.gameover?(socket.assigns.board_pid) do
       send(self(), :gameover)
     else
       Process.send_after(self(), :tick, socket.assigns.delay)

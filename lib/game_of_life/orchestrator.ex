@@ -8,10 +8,11 @@ defmodule GameOfLife.Orchestrator do
 
   def next(pid), do: GenServer.call(pid, :next)
   def board(pid), do: GenServer.call(pid, :board)
-  def toggle_cell(pid, i, j), do: GenServer.cast(pid, {:toggle, %{i: i, j: j}})
-  def drop(pid, %{i: _i, j: _j, pattern: _pattern} = item), do: GenServer.cast(pid, {:drop, item})
   def gameover?(pid), do: GenServer.call(pid, :gameover)
   def alive(pid), do: GenServer.call(pid, :alive)
+  def σιζε(pid, size), do: GenServer.cast(pid, {:size, size})
+  def toggle_cell(pid, i, j), do: GenServer.cast(pid, {:toggle, %{i: i, j: j}})
+  def drop(pid, %{i: _i, j: _j, pattern: _pattern} = item), do: GenServer.cast(pid, {:drop, item})
 
   @impl true
   def init(opts) do
@@ -25,7 +26,7 @@ defmodule GameOfLife.Orchestrator do
        mode: mode,
        board: board,
        gen: 0,
-       alive: 0
+       alive: Enum.count(board)
      }}
   end
 
@@ -36,11 +37,27 @@ defmodule GameOfLife.Orchestrator do
 
   @impl true
   def handle_call(:next, _from, %__MODULE__{} = state) do
+    dbg(state.board)
+
+    board =
+      Enum.map(state.board, fn
+        {k, v} ->
+          total = calculate_cell(state.board, k, state.size)
+
+          cond do
+            total == 3 -> {k, 1}
+            2 <= total and total <= 3 and v == 1 -> {k, v}
+            true -> {k, 0}
+          end
+      end)
+      |> Enum.filter(fn {_k, v} -> v == 1 end)
+      |> Map.new()
+
+    dbg(board)
+
     new_state = %__MODULE__{
       state
-      | board:
-          state.board
-          |> apply_rules(state.size),
+      | board: board,
         alive: Enum.count(state.board),
         gen: state.gen + 1
     }
@@ -50,12 +67,12 @@ defmodule GameOfLife.Orchestrator do
 
   @impl true
   def handle_call(:gameover, _from, state) do
-    {:reply, state.alive == 0, state}
+    {:reply, state.alive == 0 && state.gen > 0, state}
   end
 
   @impl true
   def handle_call(:board, _from, %__MODULE__{} = state) do
-    {:reply, state.board, state}
+    {:reply, state, state}
   end
 
   @impl true
@@ -73,9 +90,13 @@ defmodule GameOfLife.Orchestrator do
   end
 
   @impl true
-  def handle_cast({:drop, %{i: _i, j: _j, pattern: _pattern} }, %Orchestrator{} = state) do
-    new_state = %Orchestrator{state | board: state.board}
-    {:noreply, new_state}
+  def handle_cast({:size, size}, %Orchestrator{} = state) do
+    {:noreply, %Orchestrator{state | board: new_board(size, state.mode), size: size}}
+  end
+
+  @impl true
+  def handle_cast({:drop, %{i: _i, j: _j, pattern: _pattern}}, %Orchestrator{} = state) do
+    {:noreply, %Orchestrator{state | board: state.board}}
   end
 
   defp new_board(_size, "custom") do
@@ -108,19 +129,6 @@ defmodule GameOfLife.Orchestrator do
         r == size - 1 -> left
         true -> left ++ right
       end
-  end
-
-  defp apply_rules(the_map, size) do
-    Enum.map(the_map, fn
-      {i, v} ->
-        total = calculate_cell(the_map, i, size)
-
-        cond do
-          total == 3 -> {i, 1}
-          2 <= total and total <= 3 and v == 1 -> {i, v}
-          true -> {i, 0}
-        end
-    end)
   end
 
   defp calculate_cell(the_map, i, size) do
