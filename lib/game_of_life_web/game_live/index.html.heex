@@ -41,7 +41,7 @@
     class="board-grid"
     style={"grid-template-columns: 520px #{@board_px}px 520px; height: #{@board_px}px;"}
   >
-    <%!-- <div class="patterns-column">
+    <div class="patterns-column">
       <div class="patterns-masonry">
         <div
           :for={{cat, v} <- GameOfLife.Patterns.all(@patterns_pid)}
@@ -50,11 +50,11 @@
           <span class="pattern-category-label">{cat}</span>
           <div :for={{l, p} <- v} class="pattern-item">
             <span class="pattern-item-label">{l}</span>
-            <.board matrix={p} id={"pattern-#{cat}-#{l}"} data={Jason.encode!(p)} cell_px={@cell_px} />
+            <.board matrix={p} size={15} id={"pattern-#{cat}-#{l}"} data={Jason.encode!(p)} cell_px={@cell_px} />
           </div>
         </div>
       </div>
-    </div> --%>
+    </div>
 
     <div style={"width: #{@board_px}px; height: #{@board_px}px;"}>
       <.board

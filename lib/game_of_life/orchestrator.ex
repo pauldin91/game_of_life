@@ -11,7 +11,7 @@ defmodule GameOfLife.Orchestrator do
   def gameover?(pid), do: GenServer.call(pid, :gameover)
   def alive(pid), do: GenServer.call(pid, :alive)
   def size(pid, size), do: GenServer.cast(pid, {:size, size})
-  def toggle_cell(pid, %{"i" => i, "j" => j} = cell), do: GenServer.cast(pid, {:toggle, cell})
+  def toggle_cell(pid, %{"i" => _i, "j" => _j} = cell), do: GenServer.cast(pid, {:toggle, cell})
 
   def drop(pid, %{"i" => _i, "j" => _j, "pattern" => _pattern} = item),
     do: GenServer.cast(pid, {:drop, item})
