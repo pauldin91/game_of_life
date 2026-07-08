@@ -18,6 +18,7 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
     - Dynamic delay of board updates
     - Toggle pixel feature
     - Start/Reset Buttons
+    - Drag n Drop patterns on Board
 
 ## Samples
 
@@ -25,18 +26,15 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
   <img src="sample/sample-1.png" >
 </p>
 
-<p align="center">
-  <img src="sample/sample-2.png" >
-</p>
-
 ## TODOs
 
 ### Features to be added later
 
+    - Optimize backend
     - Statistics (generation,alive etc.)
-    - Drag & drop Patterns on Board
     - Game Variations (HighLife etc.)
     - Modes (random,custom etc.)
+    
 
 ## Learn more
 
