@@ -44,14 +44,16 @@
     <div class="patterns-column">
       <div class="patterns-masonry">
         <div
-          :for={{cat, v} <- GameOfLife.Patterns.all(@patterns_pid)}
+          :for={{name, {s, value}} <- GameOfLife.Patterns.all(@patterns_pid)}
           class="pattern-category"
         >
-          <span class="pattern-category-label">{cat}</span>
-          <div :for={{l, p} <- v} class="pattern-item">
-            <span class="pattern-item-label">{l}</span>
-            <.board matrix={p} size={15} id={"pattern-#{cat}-#{l}"} data={Jason.encode!(p)} cell_px={@cell_px} />
-          </div>
+          <span class="pattern-item-label">{name}</span>
+          <.board
+            matrix={value}
+            size={s}
+            id={"pattern-#{name}"}
+            cell_px={@cell_px}
+          />
         </div>
       </div>
     </div>

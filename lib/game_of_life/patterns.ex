@@ -15,8 +15,8 @@ defmodule GameOfLife.Patterns do
       {
         :ok,
         serialized
-        |> Enum.map(fn {k, v} ->
-          {k, Map.new(v, fn {name, value} -> {name, as_map(value)} end)}
+        |> Enum.map(fn {name, %{"content"=>c,"size" => s}} ->
+           {name, {s,as_map(c)}}
         end)
         |> Map.new()
       }
