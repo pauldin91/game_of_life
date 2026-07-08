@@ -1,4 +1,4 @@
-# Conway's GameOfLife Simultation with LiveView
+# Conway's GameOfLife Simulation with LiveView
 
 To start your Phoenix server:
 
@@ -13,12 +13,13 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
 
 ## Features
 
-    - Chessboard like front-end with color annotations for living/dead cells
+    - Chessboard like front-end for living/dead cells
     - Dynamic board size
     - Dynamic delay of board updates
     - Toggle pixel feature
-    - Start/Reset Buttons
+    - Start/Pause and Reset Buttons
     - Drag n Drop patterns on Board
+    - Modes (random,custom etc.)
 
 ## Samples
 
@@ -33,7 +34,7 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
     - Optimize backend
     - Statistics (generation,alive etc.)
     - Game Variations (HighLife etc.)
-    - Modes (random,custom etc.)
+
     
 
 ## Learn more
