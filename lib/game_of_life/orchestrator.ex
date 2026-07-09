@@ -146,7 +146,7 @@ defmodule GameOfLife.Orchestrator do
       Enum.map(matrix.board, fn {x, y} ->
         repl =
           Map.get(
-            make_map(pattern["content"], (i - 1) * pattern["size"] + j - 1, matrix.size),
+            make_map(pattern.board, (i - 1) * pattern.size + j - 1, matrix.size),
             x,
             nil
           )

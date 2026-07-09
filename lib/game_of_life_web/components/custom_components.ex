@@ -47,7 +47,7 @@ defmodule GameOfLifeWeb.CustomComponents do
       ]}
       style={
         if @cell_px do
-          cols = if(@matrix.board == %{}, do: 0, else: @matrix.size)
+          cols = if(@matrix.board== %{}, do: 0, else: @matrix.size)
           "width: #{@cell_px * cols}px;"
         else
           ""
@@ -55,7 +55,7 @@ defmodule GameOfLifeWeb.CustomComponents do
       }
     >
       <tbody>
-        <tr :for={i <- 0..(@matrix.size  - 1)}>
+        <tr :for={i <- 0..(@matrix.size - 1)}>
           <td
             :for={j <- 0..(@matrix.size  - 1)}
             class={[
