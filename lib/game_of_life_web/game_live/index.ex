@@ -104,17 +104,20 @@ defmodule GameOfLifeWeb.GameLive.Index do
   def handle_event("drop_pattern", _params, socket), do: {:noreply, socket}
 
   @impl true
-  def handle_event("toggle", %{"i" => i, "j" => j}, socket),
-    do:
-      {:noreply,
-       socket
-       |> assign(
-         :board,
-         GameOfLife.Orchestrator.toggle_cell(
-           socket.assigns.board_pid,
-           %{"i" => String.to_integer(i), "j" => String.to_integer(j)}
-         )
-       )}
+  def handle_event("toggle", %{"i" => i, "j" => j}, socket) do
+    with :ok <-
+           GameOfLife.Orchestrator.toggle_cell(
+             socket.assigns.board_pid,
+             %{"i" => String.to_integer(i), "j" => String.to_integer(j)}
+           ),
+         do:
+           {:noreply,
+            socket
+            |> assign(
+              :board,
+              GameOfLife.Orchestrator.board(socket.assigns.board_pid)
+            )}
+  end
 
   @impl true
   def handle_event("screen_size", %{"width" => w, "height" => h}, socket) do
