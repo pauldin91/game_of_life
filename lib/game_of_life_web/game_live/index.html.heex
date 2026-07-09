@@ -44,8 +44,8 @@
     <div class="patterns-column">
       <div class="patterns-masonry">
         <div
-          :for={{name, {s, value}} <- GameOfLife.Patterns.all(@patterns_pid)}
-          class="pattern-category"
+          :for={{name, {s, value}} <- GameOfLife.Patterns.all(@patterns_pid) }
+          class="pattern-item"
         >
           <span class="pattern-item-label">{name}</span>
           <.board
@@ -53,6 +53,7 @@
             size={s}
             id={"pattern-#{name}"}
             cell_px={@cell_px}
+            data={Jason.encode!(value)}
           />
         </div>
       </div>

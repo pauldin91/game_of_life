@@ -89,16 +89,20 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   @impl true
   def handle_event("drop_pattern", %{"i" => i, "j" => j, "pattern" => pattern}, socket) do
-    {:noreply,
-     socket
-     |> assign(
-       :board,
-       GameOfLife.Orchestrator.drop(socket.assigns.board_pid, %{
-         "i" => i,
-         "j" => j,
-         "pattern" => pattern
-       })
-     )}
+    dbg(pattern)
+    with :ok <-
+           GameOfLife.Orchestrator.drop(socket.assigns.board_pid, %{
+             "i" => i,
+             "j" => j,
+             "pattern" => pattern
+           }),
+         do:
+           {:noreply,
+            socket
+            |> assign(
+              :board,
+              GameOfLife.Orchestrator.board(socket.assigns.board_pid)
+            )}
   end
 
   def handle_event("drop_pattern", _params, socket), do: {:noreply, socket}

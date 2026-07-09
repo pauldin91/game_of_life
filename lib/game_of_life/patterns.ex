@@ -18,6 +18,7 @@ defmodule GameOfLife.Patterns do
         |> Enum.map(fn {name, %{"content" => c, "size" => s}} ->
           {name, {s, as_map(c)}}
         end)
+        |> Enum.sort(fn {n1, _}, {n2, _} -> Map.get(@sorter, n1) < Map.get(@sorter, n2) end)
         |> Map.new()
       }
     end

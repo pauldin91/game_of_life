@@ -95,8 +95,12 @@ defmodule GameOfLife.Orchestrator do
   end
 
   @impl true
-  def handle_cast({:drop, %{"i" => _i, "j" => _j, "pattern" => _pattern}}, %Orchestrator{} = state) do
-    {:noreply, %Orchestrator{state | board: state.board}}
+  def handle_cast(
+        {:drop, %{"i" => _i, "j" => _j, "pattern" => _pattern} = item},
+        %Orchestrator{} = state
+      ) do
+    with {:ok, board} <- do_replace(state, item),
+         do: {:noreply, %Orchestrator{state | board: board}}
   end
 
   defp new_board(_size, "custom") do
@@ -128,12 +132,48 @@ defmodule GameOfLife.Orchestrator do
         r == 0 -> right
         r == size - 1 -> left
         true -> left ++ right
-    end
+      end
   end
 
   defp calculate_cell(the_map, i, size) do
     indices(i, size)
     |> Enum.map(fn i -> Map.get(the_map, i, 0) end)
     |> Enum.sum()
+  end
+
+  def do_replace(matrix, %{"i" => i, "j" => j, "pattern" => pattern}) do
+    res =
+      Enum.map(matrix.board, fn {x, y} ->
+        repl =
+          Map.get(
+            make_map(pattern["content"], (i - 1) * pattern["size"] + j - 1, matrix.size),
+            x,
+            nil
+          )
+
+        cond do
+          repl == nil -> {x, y}
+          true -> {x, repl}
+        end
+      end)
+
+    {:ok, res}
+  end
+
+  defp make_map(matrix, offset, global_mat_size) do
+    Enum.zip(
+      Enum.with_index(
+        offset..(offset + matrix.size * matrix.size - 1)
+        |> Enum.chunk_every(matrix.size)
+      )
+      |> Enum.map(fn {x, i} ->
+        Enum.map(x, fn y -> y + i * (global_mat_size - matrix.size) end)
+      end)
+      |> Enum.reduce([], fn x, acc -> acc ++ x end),
+      Map.keys(matrix) |> Enum.flat_map()
+    )
+    |> Map.new(fn {k, v} ->
+      {k, v}
+    end)
   end
 end
