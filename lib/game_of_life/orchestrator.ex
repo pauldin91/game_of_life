@@ -142,11 +142,18 @@ defmodule GameOfLife.Orchestrator do
   end
 
   def do_replace(matrix, %{"i" => i, "j" => j, "pattern" => pattern}) do
+    pat = %{
+      board: pattern["board"] |> Map.new(fn {x, y} -> {String.to_integer(x), y} end),
+      size: pattern["size"]
+    }
+    dbg(pat)
+
+
     res =
       Enum.map(matrix.board, fn {x, y} ->
         repl =
           Map.get(
-            make_map(pattern.board, (i - 1) * pattern.size + j - 1, matrix.size),
+            make_map(pat, (i - 1) * pat.size + j - 1, matrix.size),
             x,
             nil
           )
@@ -156,6 +163,7 @@ defmodule GameOfLife.Orchestrator do
           true -> {x, repl}
         end
       end)
+      |> Map.new()
 
     {:ok, res}
   end
@@ -170,7 +178,7 @@ defmodule GameOfLife.Orchestrator do
         Enum.map(x, fn y -> y + i * (global_mat_size - matrix.size) end)
       end)
       |> Enum.reduce([], fn x, acc -> acc ++ x end),
-      Map.keys(matrix) |> Enum.flat_map()
+      Map.keys(matrix.board)
     )
     |> Map.new(fn {k, v} ->
       {k, v}

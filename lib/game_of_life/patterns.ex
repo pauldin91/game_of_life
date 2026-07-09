@@ -15,7 +15,7 @@ defmodule GameOfLife.Patterns do
       {
         :ok,
         serialized
-        |> Enum.map(fn {name, %{"content" => c, "size" => s}} ->
+        |> Enum.map(fn {name, %{"board" => c, "size" => s}} ->
           {name, {s, as_map(c)}}
         end)
         |> Enum.sort(fn {n1, _}, {n2, _} -> Map.get(@sorter, n1) < Map.get(@sorter, n2) end)
