@@ -15,8 +15,8 @@ defmodule GameOfLife.Patterns do
       {
         :ok,
         serialized
-        |> Enum.map(fn {name, %{"content"=>c,"size" => s}} ->
-           {name, {s,as_map(c)}}
+        |> Enum.map(fn {name, %{"content" => c, "size" => s}} ->
+          {name, {s, as_map(c)}}
         end)
         |> Map.new()
       }
@@ -35,6 +35,7 @@ defmodule GameOfLife.Patterns do
 
   def as_map(pattern) do
     Enum.with_index(Enum.reduce(pattern, [], fn t, acc -> acc ++ t end), 0)
+    |> Enum.filter(fn {v, _k} -> v == 1 end)
     |> Map.new(fn {v, k} -> {k, v} end)
   end
 end
