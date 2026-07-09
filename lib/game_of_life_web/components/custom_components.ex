@@ -40,14 +40,14 @@ defmodule GameOfLifeWeb.CustomComponents do
       draggable={"#{!@dropzone}"}
       phx-hook={if @dropzone, do: "BoardDropzone", else: "Pattern"}
       data-pattern={if !@dropzone, do: @data}
-      data-size={@size}
+      data-size={@matrix.size }
       class={[
         "board-table",
         @dropzone && "board-dropzone"
       ]}
       style={
         if @cell_px do
-          cols = if(@matrix == %{}, do: 0, else: @size)
+          cols = if(@matrix.board == %{}, do: 0, else: @matrix.size)
           "width: #{@cell_px * cols}px;"
         else
           ""
@@ -55,12 +55,12 @@ defmodule GameOfLifeWeb.CustomComponents do
       }
     >
       <tbody>
-        <tr :for={i <- 0..(@size - 1)}>
+        <tr :for={i <- 0..(@matrix.size  - 1)}>
           <td
-            :for={j <- 0..(@size - 1)}
+            :for={j <- 0..(@matrix.size  - 1)}
             class={[
               "board-cell",
-              if(Map.get(@matrix, i * @size + j, nil) == nil,
+              if(Map.get(@matrix.board, i * @matrix.size + j, nil) == nil,
                 do: "board-cell-light",
                 else: "board-cell-dark"
               ),
