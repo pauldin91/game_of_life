@@ -99,16 +99,21 @@ defmodule GameOfLife.Orchestrator do
         {:drop, %{"i" => i, "j" => j, "pattern" => pattern} = item},
         %Orchestrator{} = state
       ) do
-    pat = %{
-      board: pattern["board"] |> Map.new(fn {x, y} -> {String.to_integer(x), y} end),
-      size: pattern["size"]
-    }
+    mid =
+      %{
+        board: pattern["board"] |> Map.new(fn {x, y} -> {String.to_integer(x), y} end),
+        size: pattern["size"]
+      }
+
+    pat = make_map(mid, (i - 1) * mid.size + j - 1, state.size)
+
+    dbg(pat)
 
     board =
-      Enum.map(pat.board, fn {x, y} ->
+      Enum.map(pat, fn {x, y} ->
         repl =
           Map.get(
-            make_map(pat, (i - 1) * pat.size + j - 1, state.size),
+            pat,
             x,
             nil
           )
