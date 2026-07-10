@@ -89,7 +89,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   @impl true
   def handle_event("drop_pattern", %{"i" => i, "j" => j, "pattern" => pattern}, socket) do
-    dbg(pattern)
+
     with :ok <-
            GameOfLife.Orchestrator.drop(socket.assigns.board_pid, %{
              "i" => i,

@@ -96,11 +96,33 @@ defmodule GameOfLife.Orchestrator do
 
   @impl true
   def handle_cast(
-        {:drop, %{"i" => _i, "j" => _j, "pattern" => _pattern} = item},
+        {:drop, %{"i" => i, "j" => j, "pattern" => pattern} = item},
         %Orchestrator{} = state
       ) do
-    with {:ok, board} <- do_replace(state, item),
-         do: {:noreply, %Orchestrator{state | board: board}}
+    pat = %{
+      board: pattern["board"] |> Map.new(fn {x, y} -> {String.to_integer(x), y} end),
+      size: pattern["size"]
+    }
+
+    dbg(item)
+
+    board =
+      Enum.map(pat.board, fn {x, y} ->
+        repl =
+          Map.get(
+            make_map(pat, (i - 1) * pat.size + j - 1, state.size),
+            x,
+            nil
+          )
+
+        cond do
+          repl == nil -> {x, y}
+          true -> {x, repl}
+        end
+      end)
+
+    dbg(board)
+    {:noreply, %Orchestrator{state | board: board |> Map.new()}}
   end
 
   defp new_board(_size, "custom") do
@@ -139,33 +161,6 @@ defmodule GameOfLife.Orchestrator do
     indices(i, size)
     |> Enum.map(fn i -> Map.get(the_map, i, 0) end)
     |> Enum.sum()
-  end
-
-  def do_replace(matrix, %{"i" => i, "j" => j, "pattern" => pattern}) do
-    pat = %{
-      board: pattern["board"] |> Map.new(fn {x, y} -> {String.to_integer(x), y} end),
-      size: pattern["size"]
-    }
-    dbg(pat)
-
-
-    res =
-      Enum.map(matrix.board, fn {x, y} ->
-        repl =
-          Map.get(
-            make_map(pat, (i - 1) * pat.size + j - 1, matrix.size),
-            x,
-            nil
-          )
-
-        cond do
-          repl == nil -> {x, y}
-          true -> {x, repl}
-        end
-      end)
-      |> Map.new()
-
-    {:ok, res}
   end
 
   defp make_map(matrix, offset, global_mat_size) do
