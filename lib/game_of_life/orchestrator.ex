@@ -104,8 +104,6 @@ defmodule GameOfLife.Orchestrator do
       size: pattern["size"]
     }
 
-    dbg(item)
-
     board =
       Enum.map(pat.board, fn {x, y} ->
         repl =
@@ -120,6 +118,8 @@ defmodule GameOfLife.Orchestrator do
           true -> {x, repl}
         end
       end)
+      |> Enum.filter(fn {_, v} -> v == 1 end)
+      |> Enum.sort(fn e1, e2 -> elem(e1, 0) < elem(e2, 0) end)
 
     dbg(board)
     {:noreply, %Orchestrator{state | board: board |> Map.new()}}
@@ -173,7 +173,8 @@ defmodule GameOfLife.Orchestrator do
         Enum.map(x, fn y -> y + i * (global_mat_size - matrix.size) end)
       end)
       |> Enum.reduce([], fn x, acc -> acc ++ x end),
-      Map.keys(matrix.board)
+      Enum.sort(matrix.board, fn e1, e2 -> elem(e1, 0) < elem(e2, 0) end)
+      |> Enum.map(fn {_i, x} -> x end)
     )
     |> Map.new(fn {k, v} ->
       {k, v}
