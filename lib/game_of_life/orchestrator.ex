@@ -7,8 +7,14 @@ defmodule GameOfLife.Orchestrator do
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts)
 
   def next(pid), do: GenServer.call(pid, :next)
-  def toggle_cell(pid, i, j), do: GenServer.cast(pid, {:toggle, %{i: i, j: j}})
+  def board(pid), do: GenServer.call(pid, :board)
   def gameover?(pid), do: GenServer.call(pid, :gameover)
+  def alive(pid), do: GenServer.call(pid, :alive)
+  def size(pid, size), do: GenServer.cast(pid, {:size, size})
+  def toggle_cell(pid, %{"i" => _i, "j" => _j} = cell), do: GenServer.cast(pid, {:toggle, cell})
+
+  def drop(pid, %{"i" => _i, "j" => _j, "pattern" => _pattern} = item),
+    do: GenServer.cast(pid, {:drop, item})
 
   @impl true
   def init(opts) do
@@ -22,18 +28,39 @@ defmodule GameOfLife.Orchestrator do
        mode: mode,
        board: board,
        gen: 0,
-       alive: 0
+       alive: Enum.count(board)
      }}
   end
 
   @impl true
+  def handle_call(:alive, _from, %__MODULE__{} = state) do
+    {:reply, state.alive, state}
+  end
+
+  @impl true
   def handle_call(:next, _from, %__MODULE__{} = state) do
-    board = tick(state.board)
+    keys =
+      Map.keys(state.board)
+      |> Enum.flat_map(&indices(&1, state.size))
+      |> Enum.uniq()
+
+    board =
+      Enum.flat_map(keys, fn k ->
+        v = Map.get(state.board, k, 0)
+        total = calculate_cell(state.board, k, state.size)
+
+        cond do
+          total == 3 -> [{k, 1}]
+          total == 2 and v == 1 -> [{k, 1}]
+          true -> []
+        end
+      end)
+      |> Map.new()
 
     new_state = %__MODULE__{
       state
       | board: board,
-        alive: alive(board),
+        alive: Enum.count(board),
         gen: state.gen + 1
     }
 
@@ -42,129 +69,72 @@ defmodule GameOfLife.Orchestrator do
 
   @impl true
   def handle_call(:gameover, _from, state) do
-    {:reply, state.alive == 0, state}
+    {:reply, state.alive == 0 && state.gen > 0, state}
   end
 
   @impl true
-  def handle_cast({:toggle, %{i: i, j: j}}, %Orchestrator{} = state) do
-    new_state = %Orchestrator{state | board: toggle(state.board, i, j)}
-    {:noreply, new_state}
+  def handle_call(:board, _from, %__MODULE__{} = state) do
+    {:reply, state, state}
   end
 
-  def new_board(size, "custom") do
-    0..(size - 1)
-    |> Enum.map(fn _ ->
-      0..(size - 1)
-      |> Enum.map(fn _ -> 0 end)
-    end)
+  @impl true
+  def handle_cast({:toggle, %{"i" => i, "j" => j}}, %Orchestrator{} = state) do
+    key = i * state.size + j
+
+    board =
+      if Map.has_key?(state.board, key),
+        do: Map.delete(state.board, key),
+        else: Map.put(state.board, key, 1)
+
+    {:noreply, %Orchestrator{state | board: board}}
   end
 
-  def new_board(size, "random") do
-    0..(size - 1)
-    |> Enum.map(fn _ ->
-      0..(size - 1)
-      |> Enum.map(fn _ -> :rand.uniform(2) - 1 end)
-    end)
-    |> Enum.reduce([], fn x, acc -> acc ++ x end)
-    |> make_map(0,size)
+  @impl true
+  def handle_cast({:size, size}, %Orchestrator{} = state) do
+    {:noreply, %Orchestrator{state | board: new_board(size, state.mode), size: size}}
   end
 
-  def drop(matrix, i, j, pattern) do
-    do_replace(matrix, i, j, pattern)
-  end
+  @impl true
+  def handle_cast(
+        {:drop, %{"i" => i, "j" => j, "pattern" => pattern} = item},
+        %Orchestrator{} = state
+      ) do
+    mid =
+      %{
+        board: pattern["board"] |> Map.new(fn {x, y} -> {String.to_integer(x), y} end),
+        size: pattern["size"]
+      }
 
-  def do_replace(matrix, i, j, pattern) do
-    size = Enum.count(Enum.at(matrix, 0))
+    offset = i * state.size + j
+
+    at =
+      0..(mid.size * mid.size + 1)
+      |> Enum.map(fn x ->
+        {x + offset, Map.get(mid.board, x, 0)}
+      end)
+      |> Map.new()
 
     pat =
-      make_map(
-        pattern,
-        (i - 1) * size + j - 1,
-        size
-      )
+      make_map(%{board: at, size: mid.size}, offset, state.size)
 
-    mat = make_map(matrix, 0, size)
-
-    res =
-      Enum.map(mat, fn {x, y} ->
-        repl = Map.get(pat, x, nil)
-
-        cond do
-          repl == nil -> {x, y}
-          true -> {x, repl}
-        end
-      end)
-      |> Enum.sort(fn e1, e2 -> elem(e1, 0) < elem(e2, 0) end)
-      |> Enum.map(fn {_i, v} -> v end)
-      |> Enum.chunk_every(length(matrix))
-
-    {:ok, res}
+    board = Map.merge(state.board, pat)
+    {:noreply, %Orchestrator{state | board: board}}
   end
 
-  defp make_map(matrix, offset, global_mat_size) do
-    size = Enum.count(Enum.at(matrix, 0))
+  defp new_board(_size, "custom") do
+    Map.new()
+  end
+
+  defp new_board(size, "random") do
+    r = 0..(size * size - 1)
 
     Enum.zip(
-      Enum.with_index(
-        offset..(offset + length(matrix) * size - 1)
-        |> Enum.chunk_every(size)
-      )
-      |> Enum.map(fn {x, i} -> Enum.map(x, fn y -> y + i * (global_mat_size - size) end) end)
-      |> Enum.reduce([], fn x, acc -> acc ++ x end),
-      Enum.reduce(matrix, [], fn x, acc -> acc ++ x end)
+      r,
+      Enum.map(r, fn _ -> :rand.uniform(2) - 1 end)
     )
-    |> Map.new(fn {k, v} ->
-      {k, v}
-    end)
+    |> Enum.filter(fn {_x, y} -> y == 1 end)
+    |> Map.new()
   end
-
-  def alive(matrix), do: Enum.reduce(matrix, 0, fn x, acc -> acc + Enum.sum(x) end)
-
-  def game_over?(matrix) do
-    sum = alive(matrix)
-
-    cond do
-      sum == 0 -> true
-      true -> false
-    end
-  end
-
-  def toggle(matrix, i, j) do
-    size = Enum.count(Enum.at(matrix, 0))
-
-    Enum.zip(
-      0..(length(matrix) * size - 1),
-      Enum.reduce(matrix, [], fn x, acc -> acc ++ x end)
-    )
-    |> Enum.map(fn {x, y} ->
-      cond do
-        i * size + j == x -> 1 - y
-        true -> y
-      end
-    end)
-    |> Enum.chunk_every(size)
-  end
-
-  @spec tick(matrix :: list(list(0 | 1))) :: list(list(0 | 1))
-  def tick([]), do: []
-
-  def tick(matrix) do
-    size = length(matrix)
-
-    make_map(matrix, size)
-    |> apply_rules(size)
-    |> Enum.sort(fn e1, e2 -> elem(e1, 0) < elem(e2, 0) end)
-    |> Enum.map(fn {_i, v} -> v end)
-    |> Enum.chunk_every(size)
-  end
-
-  defp make_map(matrix, size),
-    do:
-      Enum.zip(
-        0..(size * size - 1),
-        Enum.reduce(matrix, [], fn x, acc -> acc ++ x end)
-      )
-      |> Map.new()
 
   defp get_side(start, step) do
     (start - step)..(start + step)//step |> Enum.map(& &1)
@@ -183,22 +153,28 @@ defmodule GameOfLife.Orchestrator do
       end
   end
 
-  defp apply_rules(the_map, size) do
-    Enum.map(the_map, fn
-      {i, v} ->
-        total = calculate_cell(the_map, i, size)
-
-        cond do
-          total == 3 -> {i, 1}
-          2 <= total and total <= 3 and v == 1 -> {i, v}
-          true -> {i, 0}
-        end
-    end)
-  end
-
   defp calculate_cell(the_map, i, size) do
     indices(i, size)
     |> Enum.map(fn i -> Map.get(the_map, i, 0) end)
     |> Enum.sum()
+  end
+
+  defp make_map(matrix, offset, global_mat_size) do
+    Enum.zip(
+      Enum.with_index(
+        offset..(offset + matrix.size * matrix.size - 1)
+        |> Enum.chunk_every(matrix.size)
+      )
+      |> Enum.map(fn {x, i} ->
+        Enum.map(x, fn y -> y + i * (global_mat_size - matrix.size) end)
+      end)
+      |> Enum.reduce([], fn x, acc -> acc ++ x end),
+      Enum.sort(matrix.board, fn e1, e2 -> elem(e1, 0) < elem(e2, 0) end)
+      |> Enum.map(fn {_i, x} -> x end)
+    )
+    |> Enum.filter(fn {_x, v} -> v == 1 end)
+    |> Map.new(fn {k, v} ->
+      {k, v}
+    end)
   end
 end

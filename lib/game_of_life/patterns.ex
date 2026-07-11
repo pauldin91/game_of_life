@@ -12,9 +12,15 @@ defmodule GameOfLife.Patterns do
   def init(_opts) do
     with {:ok, contents} <- File.read("patterns.json"),
          {:ok, serialized} <- Jason.decode(contents) do
-      {:ok,
-       serialized
-       |> Enum.sort(fn x,y -> Map.get(@sorter,elem(x,0),0) > Map.get(@sorter,elem(y,0),0)  end)}
+      {
+        :ok,
+        serialized
+        |> Enum.map(fn {name, %{"board" => c, "size" => s}} ->
+          {name, {s, as_map(c)}}
+        end)
+        |> Enum.sort(fn {n1, _}, {n2, _} -> Map.get(@sorter, n1) < Map.get(@sorter, n2) end)
+        |> Map.new()
+      }
     end
   end
 
@@ -26,5 +32,11 @@ defmodule GameOfLife.Patterns do
   @impl true
   def handle_call(:all, _from, patterns) do
     {:reply, patterns, patterns}
+  end
+
+  def as_map(pattern) do
+    Enum.with_index(Enum.reduce(pattern, [], fn t, acc -> acc ++ t end), 0)
+    |> Enum.filter(fn {v, _k} -> v == 1 end)
+    |> Map.new(fn {v, k} -> {k, v} end)
   end
 end
