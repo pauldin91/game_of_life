@@ -105,23 +105,24 @@ defmodule GameOfLife.Orchestrator do
         size: pattern["size"]
       }
 
-    pat = Map.new(mid.board, fn {x, y} -> {get_index(x, i, j, state.size, mid.size), y} end)
-    dbg(mid)
-    dbg(pat)
+    offset = i * state.size + j
+
+    at =
+      0..(mid.size * mid.size + 1)
+      |> Enum.map(fn x ->
+        {x + offset, Map.get(mid.board, x, 0)}
+      end)
+      |> Map.new()
+
+    pat =
+      make_map(%{board: at, size: mid.size}, offset, state.size)
 
     board = Map.merge(state.board, pat)
-
-    dbg(board)
     {:noreply, %Orchestrator{state | board: board}}
   end
 
   defp new_board(_size, "custom") do
     Map.new()
-  end
-
-  defp get_index(x, i, j, size_mat, size_pat) do
-    offset = (i - 1) * size_mat + j - 1
-    x + offset
   end
 
   defp new_board(size, "random") do
@@ -171,6 +172,7 @@ defmodule GameOfLife.Orchestrator do
       Enum.sort(matrix.board, fn e1, e2 -> elem(e1, 0) < elem(e2, 0) end)
       |> Enum.map(fn {_i, x} -> x end)
     )
+    |> Enum.filter(fn {_x, v} -> v == 1 end)
     |> Map.new(fn {k, v} ->
       {k, v}
     end)
