@@ -26,7 +26,6 @@ defmodule GameOfLifeWeb.CustomComponents do
   end
 
   attr :matrix, :any, required: true
-  attr :size, :integer, required: true
   attr :id, :string, required: true
   attr :toggleable, :boolean, default: false
   attr :dropzone, :boolean, default: false

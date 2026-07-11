@@ -96,7 +96,7 @@ defmodule GameOfLife.Orchestrator do
 
   @impl true
   def handle_cast(
-        {:drop, %{"i" => i, "j" => j, "pattern" => pattern} = item},
+        {:drop, %{"i" => i, "j" => j, "pattern" => pattern}},
         %Orchestrator{} = state
       ) do
     mid =
