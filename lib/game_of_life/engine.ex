@@ -1,5 +1,5 @@
-defmodule GameOfLife.Orchestrator do
-  alias GameOfLife.Orchestrator
+defmodule GameOfLife.Engine do
+  alias GameOfLife.Engine
   use GenServer
 
   defstruct [:size, :mode, :board, gen: 0, alive: 0]
@@ -20,10 +20,10 @@ defmodule GameOfLife.Orchestrator do
   def init(opts) do
     size = Keyword.fetch!(opts, :size)
     mode = Keyword.fetch!(opts, :mode)
-    board = new_board(size, mode)
+    board = GameOfLife.Board.new_board(size, mode)
 
     {:ok,
-     %Orchestrator{
+     %Engine{
        size: size,
        mode: mode,
        board: board,
@@ -41,13 +41,13 @@ defmodule GameOfLife.Orchestrator do
   def handle_call(:next, _from, %__MODULE__{} = state) do
     keys =
       Map.keys(state.board)
-      |> Enum.flat_map(&indices(&1, state.size))
+      |> Enum.flat_map(&GameOfLife.Board.indices(&1, state.size))
       |> Enum.uniq()
 
     board =
       Enum.flat_map(keys, fn k ->
         v = Map.get(state.board, k, 0)
-        total = calculate_cell(state.board, k, state.size)
+        total = GameOfLife.Board.calculate_cell(state.board, k, state.size)
 
         cond do
           total == 3 -> [{k, 1}]
@@ -78,7 +78,7 @@ defmodule GameOfLife.Orchestrator do
   end
 
   @impl true
-  def handle_cast({:toggle, %{"i" => i, "j" => j}}, %Orchestrator{} = state) do
+  def handle_cast({:toggle, %{"i" => i, "j" => j}}, %Engine{} = state) do
     key = i * state.size + j
 
     board =
@@ -86,18 +86,18 @@ defmodule GameOfLife.Orchestrator do
         do: Map.delete(state.board, key),
         else: Map.put(state.board, key, 1)
 
-    {:noreply, %Orchestrator{state | board: board}}
+    {:noreply, %Engine{state | board: board}}
   end
 
   @impl true
-  def handle_cast({:size, size}, %Orchestrator{} = state) do
-    {:noreply, %Orchestrator{state | board: new_board(size, state.mode), size: size}}
+  def handle_cast({:size, size}, %Engine{} = state) do
+    {:noreply, %Engine{state | board: GameOfLife.Board.new_board(size, state.mode), size: size}}
   end
 
   @impl true
   def handle_cast(
         {:drop, %{"i" => i, "j" => j, "pattern" => pattern}},
-        %Orchestrator{} = state
+        %Engine{} = state
       ) do
     mid =
       %{
@@ -118,45 +118,7 @@ defmodule GameOfLife.Orchestrator do
       make_map(%{board: at, size: mid.size}, offset, state.size)
 
     board = Map.merge(state.board, pat)
-    {:noreply, %Orchestrator{state | board: board}}
-  end
-
-  defp new_board(_size, "custom") do
-    Map.new()
-  end
-
-  defp new_board(size, "random") do
-    r = 0..(size * size - 1)
-
-    Enum.zip(
-      r,
-      Enum.map(r, fn _ -> :rand.uniform(2) - 1 end)
-    )
-    |> Enum.filter(fn {_x, y} -> y == 1 end)
-    |> Map.new()
-  end
-
-  defp get_side(start, step) do
-    (start - step)..(start + step)//step |> Enum.map(& &1)
-  end
-
-  defp indices(i, size) do
-    r = rem(i, size)
-    right = get_side(i + 1, size)
-    left = get_side(i - 1, size)
-
-    [i - size, i + size] ++
-      cond do
-        r == 0 -> right
-        r == size - 1 -> left
-        true -> left ++ right
-      end
-  end
-
-  defp calculate_cell(the_map, i, size) do
-    indices(i, size)
-    |> Enum.map(fn i -> Map.get(the_map, i, 0) end)
-    |> Enum.sum()
+    {:noreply, %Engine{state | board: board}}
   end
 
   defp make_map(matrix, offset, global_mat_size) do

@@ -18,7 +18,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
     {:ok, patterns_pid} = GameOfLife.Patterns.start_link([])
 
     {:ok, board_pid} =
-      GameOfLife.Orchestrator.start_link(size: @default_size, mode: @default_mode)
+      GameOfLife.Engine.start_link(size: @default_size, mode: @default_mode)
 
     max_board_px = min(600, @phase2_threshold * @initial_cell_px)
 
@@ -31,7 +31,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
      |> assign(:running, false)
      |> assign(:patterns_pid, patterns_pid)
      |> assign(:board_pid, board_pid)
-     |> assign(:board, GameOfLife.Orchestrator.board(board_pid))
+     |> assign(:board, GameOfLife.Engine.board(board_pid))
      |> assign(:max_board_px, max_board_px)
      |> assign(:max_size, max_board_px)
      |> assign(:board_px, board_dims(@default_size, max_board_px))
@@ -78,20 +78,20 @@ defmodule GameOfLifeWeb.GameLive.Index do
   def handle_event("start", _params, socket), do: {:noreply, socket}
 
   def handle_event("select_mode", %{"selected_mode" => mode}, socket) do
-    {:ok, pid} = GameOfLife.Orchestrator.start_link(size: socket.assigns.size, mode: mode)
+    {:ok, pid} = GameOfLife.Engine.start_link(size: socket.assigns.size, mode: mode)
 
     {:noreply,
      socket
      |> assign(:selected_mode, mode)
      |> assign(:board_pid, pid)
-     |> assign(:board, GameOfLife.Orchestrator.board(pid))}
+     |> assign(:board, GameOfLife.Engine.board(pid))}
   end
 
   @impl true
   def handle_event("drop_pattern", %{"i" => i, "j" => j, "pattern" => pattern}, socket) do
 
     with :ok <-
-           GameOfLife.Orchestrator.drop(socket.assigns.board_pid, %{
+           GameOfLife.Engine.drop(socket.assigns.board_pid, %{
              "i" => i,
              "j" => j,
              "pattern" => pattern
@@ -101,7 +101,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
             socket
             |> assign(
               :board,
-              GameOfLife.Orchestrator.board(socket.assigns.board_pid)
+              GameOfLife.Engine.board(socket.assigns.board_pid)
             )}
   end
 
@@ -110,7 +110,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
   @impl true
   def handle_event("toggle", %{"i" => i, "j" => j}, socket) do
     with :ok <-
-           GameOfLife.Orchestrator.toggle_cell(
+           GameOfLife.Engine.toggle_cell(
              socket.assigns.board_pid,
              %{"i" => String.to_integer(i), "j" => String.to_integer(j)}
            ),
@@ -119,14 +119,13 @@ defmodule GameOfLifeWeb.GameLive.Index do
             socket
             |> assign(
               :board,
-              GameOfLife.Orchestrator.board(socket.assigns.board_pid)
+              GameOfLife.Engine.board(socket.assigns.board_pid)
             )}
   end
 
   @impl true
   def handle_event("screen_size", %{"width" => w, "height" => h}, socket) do
     max_board_px = compute_board_px(w, h)
-    # cap max_board_px at the natural phase-1 ceiling so board never exceeds threshold size
     max_board_px = min(max_board_px, @phase2_threshold * @initial_cell_px)
     size = socket.assigns.size
 
@@ -146,7 +145,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   def handle_info(:tick, %{assigns: %{running: true}} = socket) do
     schedule_tick(socket)
-    {:noreply, assign(socket, :board, GameOfLife.Orchestrator.next(socket.assigns.board_pid))}
+    {:noreply, assign(socket, :board, GameOfLife.Engine.next(socket.assigns.board_pid))}
   end
 
   @impl true
@@ -159,7 +158,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   defp do_reset(socket) do
     {:ok, board_pid} =
-      GameOfLife.Orchestrator.start_link(
+      GameOfLife.Engine.start_link(
         size: socket.assigns.size,
         mode: socket.assigns.selected_mode
       )
@@ -169,12 +168,12 @@ defmodule GameOfLifeWeb.GameLive.Index do
       :board_pid,
       board_pid
     )
-    |> assign(:board, GameOfLife.Orchestrator.board(board_pid))
+    |> assign(:board, GameOfLife.Engine.board(board_pid))
     |> assign(:running, false)
   end
 
   defp schedule_tick(socket) do
-    if GameOfLife.Orchestrator.gameover?(socket.assigns.board_pid) do
+    if GameOfLife.Engine.gameover?(socket.assigns.board_pid) do
       send(self(), :gameover)
     else
       Process.send_after(self(), :tick, socket.assigns.delay)
