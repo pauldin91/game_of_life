@@ -20,6 +20,7 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
     - Start/Pause and Reset Buttons
     - Drag n Drop patterns on Board
     - Modes (random,custom etc.)
+    - Use maps to optimize backend
 
 ## Samples
 
@@ -31,7 +32,6 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
 
 ### Features to be added later
 
-    - Optimize backend
     - Statistics (generation,alive etc.)
     - Game Variations (HighLife etc.)
 
