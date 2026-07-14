@@ -9,7 +9,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
   @padding 48
   @controls_h 160
   @default_mode "custom"
-  @modes [{"Random", "random"}, {"Custom", "custom"}]
+  @modes ["random", "custom"]
   @initial_cell_px 20
   @phase2_threshold 48
 

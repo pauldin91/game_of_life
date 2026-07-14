@@ -10,18 +10,7 @@
         %{name: "size", value: @size, default: @size, min: 5, max: @max_size, step: 1}
       } />
 
-      <form class="mode-select-form" phx-change="select_mode">
-        <label for="mode-select" class="mode-select-label">Select mode</label>
-        <select id="mode-select" name="selected_mode" class="mode-select">
-          <option
-            :for={{label, value} <- @modes}
-            value={value}
-            selected={value == @selected_mode}
-          >
-            {label}
-          </option>
-        </select>
-      </form>
+      <.render_options modes={@modes} selected_mode={@selected_mode} />
     </div>
 
     <div class="controls-actions">

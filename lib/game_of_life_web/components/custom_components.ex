@@ -25,6 +25,27 @@ defmodule GameOfLifeWeb.CustomComponents do
     """
   end
 
+  attr :mode, :string, required: true
+  attr :selected_mode, :string, required: true
+
+  @spec render_options(map()) :: Phoenix.LiveView.Rendered.t()
+  def render_options(assigns) do
+    ~H"""
+    <form class="mode-select-form" phx-change="select_mode">
+      <label for="mode-select" class="mode-select-label">Select mode</label>
+      <select id="mode-select" name="selected_mode" class="mode-select">
+        <option
+          :for={mode <- @modes}
+          value={mode}
+          selected={mode == @selected_mode}
+        >
+          {mode}
+        </option>
+      </select>
+    </form>
+    """
+  end
+
   attr :matrix, :any, required: true
   attr :id, :string, required: true
   attr :toggleable, :boolean, default: false
@@ -39,14 +60,14 @@ defmodule GameOfLifeWeb.CustomComponents do
       draggable={"#{!@dropzone}"}
       phx-hook={if @dropzone, do: "BoardDropzone", else: "Pattern"}
       data-pattern={if !@dropzone, do: @data}
-      data-size={@matrix.size }
+      data-size={@matrix.size}
       class={[
         "board-table",
         @dropzone && "board-dropzone"
       ]}
       style={
         if @cell_px do
-          cols = if(@matrix.board== %{}, do: 0, else: @matrix.size)
+          cols = if(@matrix.board == %{}, do: 0, else: @matrix.size)
           "width: #{@cell_px * cols}px;"
         else
           ""
@@ -56,7 +77,7 @@ defmodule GameOfLifeWeb.CustomComponents do
       <tbody>
         <tr :for={i <- 0..(@matrix.size - 1)}>
           <td
-            :for={j <- 0..(@matrix.size  - 1)}
+            :for={j <- 0..(@matrix.size - 1)}
             class={[
               "board-cell",
               if(Map.get(@matrix.board, i * @matrix.size + j, nil) == nil,
