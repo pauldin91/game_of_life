@@ -7,7 +7,10 @@
         %{name: "delay", value: @delay, default: @delay, min: 50, max: 2000, step: 50}
       } />
       <.render_prop_input entry={
-        %{name: "size", value: @size, default: @size, min: 5, max: @max_size, step: 1}
+        %{name: "rows", value: @rows, default: @rows, min: 5, max: @max_board_px.h, step: 1}
+      } />
+      <.render_prop_input entry={
+        %{name: "cols", value: @cols, default: @cols, min: 5, max: @max_board_px.w, step: 1}
       } />
 
       <.render_options modes={@modes} selected_mode={@selected_mode} />
@@ -28,26 +31,26 @@
 
   <div
     class="board-grid"
-    style={"grid-template-columns: 520px #{@board_px}px 520px; height: #{@board_px}px;"}
+    style={"grid-template-columns: 520px #{@board_px.w}px 520px; height: #{@board_px.h}px;"}
   >
     <div class="patterns-column">
       <div class="patterns-masonry">
         <div
-          :for={{name, {s, value}} <- GameOfLife.Patterns.all(@patterns_pid)}
+          :for={{name, {r, c, value}} <- GameOfLife.Patterns.all(@patterns_pid)}
           class="pattern-item"
         >
           <span class="pattern-item-label">{name}</span>
           <.board
-            matrix={%{size: s, board: value}}
+            matrix={%{rows: r, cols: c, board: value}}
             id={"pattern-#{name}"}
             cell_px={@cell_px}
-            data={Jason.encode!(%{size: s, board: value})}
+            data={Jason.encode!(%{rows: r, cols: c, board: value})}
           />
         </div>
       </div>
     </div>
 
-    <div style={"width: #{@board_px}px; height: #{@board_px}px;"}>
+    <div style={"width: #{@board_px.w}px; height: #{@board_px.h}px;"}>
       <.board
         matrix={@board}
         id="board-dropzone"

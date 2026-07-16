@@ -4,8 +4,8 @@ defmodule GameOfLife.Board do
     Map.new()
   end
 
-  def new_board(size, "random") do
-    r = 0..(size * size - 1)
+  def new_board(%{"rows"=>rows,"cols"=>cols}, "random") do
+    r = 0..(rows * cols - 1)
 
     Enum.zip(
       r,
@@ -19,21 +19,22 @@ defmodule GameOfLife.Board do
     (start - step)..(start + step)//step |> Enum.map(& &1)
   end
 
-  def indices(i, size) do
-    r = rem(i, size)
-    right = get_side(i + 1, size)
-    left = get_side(i - 1, size)
+  def indices(i, rows, cols) do
+    r = rem(i, cols)
+    right = get_side(i + 1, cols)
+    left = get_side(i - 1, cols)
 
-    [i - size, i + size] ++
+    [i - cols, i + cols] ++
       cond do
         r == 0 -> right
-        r == size - 1 -> left
+        r == cols - 1 -> left
         true -> left ++ right
       end
+    |> Enum.filter(fn idx -> idx >= 0 and idx < rows * cols end)
   end
 
-  def calculate_cell(the_map, i, size) do
-    indices(i, size)
+  def calculate_cell(the_map, i, rows, cols) do
+    indices(i, rows, cols)
     |> Enum.map(fn i -> Map.get(the_map, i, 0) end)
     |> Enum.sum()
   end
