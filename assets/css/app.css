@@ -166,7 +166,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   padding: 1.5rem;
   height: 100vh;
   overflow: hidden;
@@ -178,31 +178,30 @@
   letter-spacing: -0.025em;
 }
 
-.controls-bar {
+.controls-column {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  align-items: center;
-  width: 100%;
-  flex-shrink: 0;
+  gap: 1.5rem;
+  align-items: flex-start;
+  padding-top: 0.25rem;
+  height: 100%;
 }
 
-.controls-row {
+.controls-stats {
+  margin-top: auto;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  gap: 2rem;
-  justify-content: center;
-  align-items: flex-end;
+  gap: 0.75rem;
+  align-items: center;
   width: 100%;
+  padding: 1rem 0;
 }
 
 .controls-actions {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  gap: 0.5rem;
   align-items: center;
-  gap: 1rem;
 }
 
 .mode-select-form {
@@ -228,10 +227,17 @@
 
 .board-grid {
   display: grid;
-  gap: 2rem;
-  justify-content: center;
-  align-items: start;
+  grid-template-columns: 20% 60% 20%;
   width: 100%;
+  flex: 1;
+  min-height: 0;
+  align-items: start;
+}
+
+.board-center {
+  height: 100%;
+  padding: 0 1rem;
+  box-sizing: border-box;
 }
 
 .patterns-column {
@@ -242,9 +248,10 @@
 }
 
 .patterns-masonry {
-  columns: 2;
-  gap: 1.5rem;
-  column-fill: balance;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
 }
 
 .pattern-category {
@@ -277,7 +284,30 @@
   color: #6b7280;
 }
 
-.prop-input-wrapper {
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #111827;
+}
+
+[data-theme=dark] .stat-value {
+  color: oklch(97.807% 0.029 256.847);
   display: flex;
   flex-direction: column;
   gap: 0.25rem;

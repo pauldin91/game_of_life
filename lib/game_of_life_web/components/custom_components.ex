@@ -25,7 +25,7 @@ defmodule GameOfLifeWeb.CustomComponents do
     """
   end
 
-  attr :mode, :string, required: true
+  attr :modes, :any, required: true
   attr :selected_mode, :string, required: true
 
   @spec render_options(map()) :: Phoenix.LiveView.Rendered.t()
@@ -52,6 +52,7 @@ defmodule GameOfLifeWeb.CustomComponents do
   attr :dropzone, :boolean, default: false
   attr :data, :string, default: ""
   attr :cell_px, :integer, default: nil
+  attr :board_px, :integer, default: nil
 
   def board(assigns) do
     ~H"""
@@ -68,7 +69,9 @@ defmodule GameOfLifeWeb.CustomComponents do
       style={
         if @cell_px do
           cols = if(@matrix.board == %{}, do: 0, else: @matrix.cols)
-          "width: #{@cell_px * cols}px;"
+          width = @cell_px * cols
+          base = "width: #{width}px;"
+          if @board_px, do: base <> " margin: auto;", else: base
         else
           ""
         end

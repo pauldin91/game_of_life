@@ -1,38 +1,7 @@
 <div class="game-layout" id="screen-size-hook" phx-hook="ScreenSize">
   <h1 class="game-title">Conway's Game of Life</h1>
 
-  <div class="controls-bar">
-    <div class="controls-row">
-      <.render_prop_input entry={
-        %{name: "delay", value: @delay, default: @delay, min: 50, max: 2000, step: 50}
-      } />
-      <.render_prop_input entry={
-        %{name: "rows", value: @rows, default: @rows, min: 5, max: @max_board_px.h, step: 1}
-      } />
-      <.render_prop_input entry={
-        %{name: "cols", value: @cols, default: @cols, min: 5, max: @max_board_px.w, step: 1}
-      } />
-
-      <.render_options modes={@modes} selected_mode={@selected_mode} />
-    </div>
-
-    <div class="controls-actions">
-      <.button :if={@running} phx-click="pause">
-        <.icon name="hero-pause-circle" class="w-7 h-7" />
-      </.button>
-      <.button :if={!@running} phx-click="start">
-        <.icon name="hero-play-circle" class="w-7 h-7" />
-      </.button>
-      <.button phx-click="reset">
-        <.icon name="hero-arrow-path" class="w-7 h-7" />
-      </.button>
-    </div>
-  </div>
-
-  <div
-    class="board-grid"
-    style={"grid-template-columns: 520px #{@board_px.w}px 520px; height: #{@board_px.h}px;"}
-  >
+  <div class="board-grid">
     <div class="patterns-column">
       <div class="patterns-masonry">
         <div
@@ -50,14 +19,46 @@
       </div>
     </div>
 
-    <div style={"width: #{@board_px.w}px; height: #{@board_px.h}px;"}>
+    <div class="board-center">
       <.board
         matrix={@board}
         id="board-dropzone"
         toggleable
         dropzone
         cell_px={@cell_px}
+        board_px={@board_px}
       />
+    </div>
+
+    <div class="controls-column">
+      <.render_prop_input entry={
+        %{name: "delay", value: @delay, default: @delay, min: 50, max: 2000, step: 50}
+      } />
+      <.render_prop_input entry={
+        %{name: "size", value: @size, default: @size, min: 5, max: @max_size, step: 1}
+      } />
+      <.render_options modes={@modes} selected_mode={@selected_mode} />
+      <div class="controls-actions">
+        <.button :if={@running} phx-click="pause">
+          <.icon name="hero-pause-circle" class="w-7 h-7" />
+        </.button>
+        <.button :if={!@running} phx-click="start">
+          <.icon name="hero-play-circle" class="w-7 h-7" />
+        </.button>
+        <.button phx-click="reset">
+          <.icon name="hero-arrow-path" class="w-7 h-7" />
+        </.button>
+      </div>
+      <div class="controls-stats">
+        <div class="stat-item">
+          <span class="stat-label">Generation</span>
+          <span class="stat-value">{@board.gen}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Alive</span>
+          <span class="stat-value">{@board.alive}</span>
+        </div>
+      </div>
     </div>
   </div>
 
