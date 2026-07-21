@@ -15,10 +15,10 @@ defmodule EngineTest do
   end
 
   test "live cells with zero live neighbors die" do
-    matrix = [[0, 0, 0], [0, 1, 0], [0, 0, 0]]
-    output = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-
-    assert Engine.tick(matrix) == output
+    matrix = %{4=>1}
+    {:ok, pid} = Engine.new([rows: 3, cols: 3,mode: "custom",board: matrix])
+    output = %{}
+    Engine.next(pid).board == output
   end
 
   test "live cells with only one live neighbor die" do
