@@ -4,7 +4,8 @@ defmodule GameOfLife.Engine do
 
   defstruct [:rows, :cols, :mode, :board, gen: 0, alive: 0]
 
-  def start_link(opts), do: GenServer.start_link(__MODULE__, opts)
+  @spec new(any()) :: :ignore | {:error, any()} | {:ok, pid()}
+  def new(opts), do: GenServer.start_link(__MODULE__, opts)
 
   def next(pid), do: GenServer.call(pid, :next)
   def board(pid), do: GenServer.call(pid, :board)

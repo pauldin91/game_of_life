@@ -19,7 +19,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
     {:ok, patterns_pid} = GameOfLife.Patterns.start_link([])
 
     {:ok, board_pid} =
-      GameOfLife.Engine.start_link(rows: @default_size, cols: @default_size, mode: @default_mode)
+      GameOfLife.Engine.new(rows: @default_size, cols: @default_size, mode: @default_mode)
 
     max_board_px = min(600, @phase2_threshold * @initial_cell_px)
 
@@ -76,7 +76,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   def handle_event("select_mode", %{"selected_mode" => mode}, socket) do
     {:ok, pid} =
-      GameOfLife.Engine.start_link(
+      GameOfLife.Engine.new(
         rows: socket.assigns.size,
         cols: socket.assigns.size,
         mode: mode
@@ -160,7 +160,7 @@ defmodule GameOfLifeWeb.GameLive.Index do
 
   defp do_reset(socket) do
     {:ok, board_pid} =
-      GameOfLife.Engine.start_link(
+      GameOfLife.Engine.new(
         rows: socket.assigns.size,
         cols: socket.assigns.size,
         mode: socket.assigns.selected_mode
