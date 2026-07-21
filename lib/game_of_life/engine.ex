@@ -25,8 +25,12 @@ defmodule GameOfLife.Engine do
     rows = Keyword.fetch!(opts, :rows)
     cols = Keyword.fetch!(opts, :cols)
     mode = Keyword.fetch!(opts, :mode)
-    board = Keyword.fetch!(opts, :board)
-    board = board || GameOfLife.Board.new_board(%{"rows" => rows, "cols" => cols}, mode)
+
+    board =
+      case Keyword.fetch(opts, :board) do
+        {:ok, board} -> board
+        _ -> GameOfLife.Board.new_board(%{"rows" => rows, "cols" => cols}, mode)
+      end
 
     {:ok,
      %Engine{
