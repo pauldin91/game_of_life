@@ -62,6 +62,8 @@ defmodule GameOfLifeWeb.CustomComponents do
       phx-hook={if @dropzone, do: "BoardDropzone", else: "Pattern"}
       data-pattern={if !@dropzone, do: @data}
       data-size={@matrix.cols}
+      data-rows={@matrix.rows}
+      data-cols={@matrix.cols}
       class={[
         "board-table",
         @dropzone && "board-dropzone"
@@ -89,9 +91,6 @@ defmodule GameOfLifeWeb.CustomComponents do
               ),
               if(@toggleable, do: "board-cell-toggleable", else: "board-cell-static")
             ]}
-            phx-click={if @toggleable, do: "toggle"}
-            phx-value-i={i}
-            phx-value-j={j}
             style={if @cell_px, do: "width: #{@cell_px}px; height: #{@cell_px}px;", else: "5px"}
           >
           </td>

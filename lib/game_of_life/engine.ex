@@ -15,7 +15,7 @@ defmodule GameOfLife.Engine do
   def size(pid, %{"rows" => _rows, "cols" => _cols} = size),
     do: GenServer.cast(pid, {:size, size})
 
-  def toggle_cell(pid, %{"i" => _i, "j" => _j} = cell), do: GenServer.cast(pid, {:toggle, cell})
+  def paint_cells(pid, cells) when is_list(cells), do: GenServer.cast(pid, {:paint, cells})
 
   def drop(pid, %{"i" => _i, "j" => _j, "pattern" => _pattern} = item),
     do: GenServer.cast(pid, {:drop, item})
@@ -89,15 +89,13 @@ defmodule GameOfLife.Engine do
   end
 
   @impl true
-  def handle_cast({:toggle, %{"i" => i, "j" => j}}, %Engine{} = state) do
-    key = i * state.cols + j
-
+  def handle_cast({:paint, cells}, %Engine{} = state) do
     board =
-      if Map.has_key?(state.board, key),
-        do: Map.delete(state.board, key),
-        else: Map.put(state.board, key, 1)
+      Enum.reduce(cells, state.board, fn %{"i" => i, "j" => j}, acc ->
+        Map.put(acc, i * state.cols + j, 1)
+      end)
 
-    {:noreply, %Engine{state | board: board}}
+    {:noreply, %Engine{state | board: board, alive: Enum.count(board)}}
   end
 
   @impl true

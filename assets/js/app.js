@@ -42,6 +42,65 @@ Hooks.ScreenSize = {
 
 Hooks.BoardDropzone = {
   mounted() {
+    let painting = false;
+    let painted = new Set();
+    let dragging = false;
+
+    const cellCoords = (e) => {
+      const rect = this.el.getBoundingClientRect();
+      const cols = Number(this.el.dataset.cols);
+      const rows = Number(this.el.dataset.rows);
+      const j = Math.floor((e.clientX - rect.left) / (rect.width / cols));
+      const i = Math.floor((e.clientY - rect.top) / (rect.height / rows));
+      if (i < 0 || j < 0 || i >= rows || j >= cols) return null;
+      return { i, j };
+    };
+
+    const paintCell = (e) => {
+      const cell = cellCoords(e);
+      if (!cell) return;
+      const key = `${cell.i},${cell.j}`;
+      if (painted.has(key)) return;
+      painted.add(key);
+
+      // optimistic local update — find the td and mark it dark immediately
+      const cols = Number(this.el.dataset.cols);
+      const tds = this.el.querySelectorAll("td");
+      const td = tds[cell.i * cols + cell.j];
+      if (td) {
+        td.classList.remove("board-cell-light");
+        td.classList.add("board-cell-dark");
+      }
+    };
+
+    const endStroke = () => {
+      if (!painting) return;
+      painting = false;
+      if (painted.size > 0) {
+        const cells = Array.from(painted).map((k) => {
+          const [i, j] = k.split(",").map(Number);
+          return { i, j };
+        });
+        this.pushEvent("paint", { cells });
+      }
+      painted = new Set();
+    };
+
+    this.el.addEventListener("mousedown", (e) => {
+      if (e.button !== 0 || dragging) return;
+      painting = true;
+      paintCell(e);
+    });
+
+    this.el.addEventListener("mousemove", (e) => {
+      if (painting) paintCell(e);
+    });
+
+    this.el.addEventListener("mouseup", endStroke);
+    this.el.addEventListener("mouseleave", endStroke);
+
+    this.el.addEventListener("dragstart", () => { dragging = true; painting = false; painted = new Set(); });
+    this.el.addEventListener("dragend", () => { dragging = false; });
 
     this.el.addEventListener("dragover", (e) => {
       e.preventDefault();
@@ -57,29 +116,12 @@ Hooks.BoardDropzone = {
       e.preventDefault();
       this.el.classList.remove("drag-over");
 
-      const pattern =
-        JSON.parse(e.dataTransfer.getData("application/json"));
+      const pattern = JSON.parse(e.dataTransfer.getData("application/json"));
+      const cell = cellCoords(e);
+      if (!cell) return;
 
-      const rect = this.el.getBoundingClientRect();
-
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const size = Number(this.el.dataset.size);
-
-      const cellWidth = rect.width / size;
-      const cellHeight = rect.height / size;
-
-      const j = Math.floor(x / cellWidth);
-      const i = Math.floor(y / cellHeight);
-
-      this.pushEvent("drop_pattern", {
-        i,
-        j,
-        pattern
-      });
+      this.pushEvent("drop_pattern", { i: cell.i, j: cell.j, pattern });
     });
-
   }
 }
 

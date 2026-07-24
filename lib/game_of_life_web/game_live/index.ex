@@ -109,19 +109,11 @@ defmodule GameOfLifeWeb.GameLive.Index do
   def handle_event("drop_pattern", _params, socket), do: {:noreply, socket}
 
   @impl true
-  def handle_event("toggle", %{"i" => i, "j" => j}, socket) do
-    with :ok <-
-           GameOfLife.Engine.toggle_cell(
-             socket.assigns.board_pid,
-             %{"i" => String.to_integer(i), "j" => String.to_integer(j)}
-           ),
-         do:
-           {:noreply,
-            socket
-            |> assign(
-              :board,
-              GameOfLife.Engine.board(socket.assigns.board_pid)
-            )}
+  def handle_event("paint", %{"cells" => cells}, socket) do
+    :ok = GameOfLife.Engine.paint_cells(socket.assigns.board_pid, cells)
+
+    {:noreply,
+     assign(socket, :board, GameOfLife.Engine.board(socket.assigns.board_pid))}
   end
 
   @impl true
