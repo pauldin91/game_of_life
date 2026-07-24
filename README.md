@@ -16,10 +16,11 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
     - Chessboard like front-end for living/dead cells
     - Dynamic board size
     - Dynamic delay of board updates
-    - Toggle pixel feature
+    - ~~Toggle pixel feature~~ Drawable board feature
     - Start/Pause and Reset Buttons
     - Drag n Drop patterns on Board
     - Modes (random,custom etc.)
+    - Statistics (generation,alive etc.)
     - Use maps to optimize backend
 
 ## Samples
@@ -31,8 +32,6 @@ A simple implementation of Conway's Game Of Life with LiveView UI.
 ## TODOs
 
 ### Features to be added later
-
-    - Statistics (generation,alive etc.)
     - Game Variations (HighLife etc.)
 
     
